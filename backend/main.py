@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException
@@ -7,7 +8,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.database import get_db
+from backend.database import engine, get_db, initialize_database
 from backend.models import AdObservation, Advertiser, LandingPage, SearchRun
 from backend.services.orchestrator import executar_varredura
 
@@ -18,7 +19,14 @@ class ScanRequest(BaseModel):
     device: str
 
 
-app = FastAPI(title="Radar API")
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    await initialize_database()
+    yield
+    await engine.dispose()
+
+
+app = FastAPI(title="Radar API", lifespan=lifespan)
 RADAR_FRONTEND_PATH = Path(__file__).resolve().parent.parent / "frontend" / "radar_mockup.html"
 
 app.add_middleware(
