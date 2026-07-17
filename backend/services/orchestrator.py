@@ -1,5 +1,5 @@
 from hashlib import sha256
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +13,39 @@ from backend.models import (
 )
 from backend.services.scraper import capturar_landing_page
 from backend.services.serpapi_service import buscar_anuncios_google
+
+
+def extrair_url_destino(link: object) -> str | None:
+    if not isinstance(link, str):
+        return None
+
+    url_analisada = urlparse(link)
+    if url_analisada.scheme not in {"http", "https"}:
+        return None
+
+    host = (url_analisada.hostname or "").lower()
+    caminho = url_analisada.path.rstrip("/")
+    host_google = (
+        host in {"google.com", "google.com.br", "googleadservices.com"}
+        or host.endswith(".google.com")
+        or host.endswith(".google.com.br")
+        or host.endswith(".googleadservices.com")
+    )
+    link_rastreador_google = caminho.endswith("/aclk") and host_google
+    if not link_rastreador_google:
+        return link
+
+    url_destino = (parse_qs(url_analisada.query).get("adurl") or [None])[0]
+    if not isinstance(url_destino, str):
+        return None
+
+    destino_analisado = urlparse(url_destino)
+    if (
+        destino_analisado.scheme not in {"http", "https"}
+        or not destino_analisado.hostname
+    ):
+        return None
+    return url_destino
 
 
 async def executar_varredura(
@@ -31,13 +64,17 @@ async def executar_varredura(
     await session.commit()
     await session.refresh(search_run)
 
+    provider_search_id = None
     try:
-        anuncios = await buscar_anuncios_google(keyword, location, device)
+        resultado_serpapi = await buscar_anuncios_google(keyword, location, device)
+        provider_search_id = resultado_serpapi.search_id
+        search_run.provider_search_id = provider_search_id
+        anuncios = resultado_serpapi.anuncios
         anuncios_persistidos = 0
 
         for anuncio in anuncios:
-            target_url = anuncio.get("link")
-            if not isinstance(target_url, str):
+            target_url = extrair_url_destino(anuncio.get("link"))
+            if target_url is None:
                 continue
 
             dominio = urlparse(target_url).netloc.lower().removeprefix("www.")
@@ -134,7 +171,7 @@ async def executar_varredura(
                     LandingPageSnapshot(
                         landing_page_id=landing_page.id,
                         ad_observation_id=observacao.id,
-                        capture_status="completed",
+                        capture_status="captured",
                         original_url=target_url,
                         h1=resultado_scraper.get("h1"),
                         h2=h2,
@@ -152,13 +189,14 @@ async def executar_varredura(
         await session.refresh(search_run)
         return search_run
 
-    except Exception:
+    except Exception as erro:
         await session.rollback()
         search_run_falhou = await session.get(SearchRun, search_run.id)
         if search_run_falhou is None:
             raise
 
         search_run_falhou.status = "failed"
+        search_run_falhou.provider_search_id = provider_search_id
+        search_run_falhou.error_message = str(erro)[:2000]
         await session.commit()
-        await session.refresh(search_run_falhou)
-        return search_run_falhou
+        raise
