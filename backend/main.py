@@ -1,5 +1,8 @@
+from pathlib import Path
+
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,6 +19,7 @@ class ScanRequest(BaseModel):
 
 
 app = FastAPI(title="Radar API")
+RADAR_FRONTEND_PATH = Path(__file__).resolve().parent.parent / "frontend" / "radar_mockup.html"
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,6 +33,11 @@ app.add_middleware(
 @app.get("/")
 async def health_check() -> dict:
     return {"status": "Radar API Online"}
+
+
+@app.get("/radar", include_in_schema=False)
+async def radar_frontend() -> FileResponse:
+    return FileResponse(RADAR_FRONTEND_PATH)
 
 
 @app.get("/api/radar/observations")
