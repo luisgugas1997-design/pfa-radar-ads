@@ -1,9 +1,11 @@
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.database import get_db
+from backend.models import AdObservation, Advertiser, LandingPage, SearchRun
 from backend.services.orchestrator import executar_varredura
 
 
@@ -27,6 +29,39 @@ app.add_middleware(
 @app.get("/")
 async def health_check() -> dict:
     return {"status": "Radar API Online"}
+
+
+@app.get("/api/radar/observations")
+async def listar_observacoes(
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    consulta = (
+        select(AdObservation, Advertiser, LandingPage, SearchRun)
+        .join(Advertiser, AdObservation.advertiser_id == Advertiser.id)
+        .outerjoin(LandingPage, AdObservation.landing_page_id == LandingPage.id)
+        .join(SearchRun, AdObservation.search_run_id == SearchRun.id)
+        .order_by(AdObservation.observed_at.desc())
+        .limit(100)
+    )
+    resultado = await db.execute(consulta)
+
+    observacoes = [
+        {
+            "id": observacao.id,
+            "advertiser": anunciante.display_name or anunciante.domain,
+            "domain": anunciante.domain,
+            "title": observacao.title,
+            "description": observacao.description,
+            "position": observacao.position_index,
+            "device": busca.device,
+            "target_url": observacao.target_url,
+            "landing_page_url": pagina.canonical_url if pagina else None,
+            "observed_at": observacao.observed_at,
+        }
+        for observacao, anunciante, pagina, busca in resultado.all()
+    ]
+
+    return {"observations": observacoes}
 
 
 @app.post("/api/radar/scan")

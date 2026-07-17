@@ -98,8 +98,8 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div id="resultados-grid" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <article id="observacao-exemplo" class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div class="relative h-44 bg-gray-200">
             <div class="absolute inset-4 rounded-lg border border-gray-300 bg-gray-100">
               <div class="h-7 rounded-t-lg border-b border-gray-300 bg-gray-300"></div>
@@ -134,8 +134,66 @@
   </main>
 
   <script>
+    const API_BASE_URL = "https://chatwoot-radar-api.phqoes.easypanel.host";
     const botaoMapear = document.getElementById("btn-mapear");
     const iconeOriginal = '<i class="fa-solid fa-magnifying-glass"></i>';
+    const resultadosGrid = document.getElementById("resultados-grid");
+
+    function escaparHtml(valor) {
+      return String(valor || "").replace(/[&<>\"]/g, (caractere) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+      })[caractere]);
+    }
+
+    function renderizarObservacoes(observacoes) {
+      if (!observacoes.length) {
+        resultadosGrid.innerHTML = '<p class="col-span-full rounded-xl border border-dashed border-gray-300 bg-white p-5 text-sm text-gray-500">Nenhuma observacao encontrada. Faca uma busca para iniciar o historico.</p>';
+        return;
+      }
+
+      resultadosGrid.innerHTML = observacoes.map((observacao) => {
+        const titulo = escaparHtml(observacao.title || "Anuncio sem titulo");
+        const descricao = escaparHtml(observacao.description || "Sem descricao disponivel.");
+        const anunciante = escaparHtml(observacao.advertiser || observacao.domain);
+        const dominio = escaparHtml(observacao.domain || observacao.target_url);
+        const dispositivo = escaparHtml(observacao.device || "nao informado");
+        const data = observacao.observed_at
+          ? new Date(observacao.observed_at).toLocaleString("pt-BR")
+          : "Data nao informada";
+        const url = encodeURI(observacao.target_url || "#");
+
+        return '<article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">'
+          + '<div class="bg-gradient-to-br from-slate-800 to-slate-600 p-5 text-white">'
+          + '<p class="text-xs font-semibold uppercase tracking-wide text-blue-200">' + anunciante + '</p>'
+          + '<p class="mt-2 text-sm text-slate-200">' + descricao + '</p>'
+          + '</div><div class="p-5">'
+          + '<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-600">Anuncio observado</p>'
+          + '<h3 class="text-lg font-bold leading-snug text-gray-900">' + titulo + '</h3>'
+          + '<p class="mt-2 truncate text-sm text-gray-500">' + dominio + '</p>'
+          + '<div class="mt-5 flex items-center justify-between gap-3 border-t border-gray-100 pt-4">'
+          + '<span class="text-xs text-gray-400">' + dispositivo + ' - ' + data + '</span>'
+          + '<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="shrink-0 text-sm font-semibold text-blue-600 hover:text-blue-800">Abrir landing page <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-xs"></i></a>'
+          + '</div></div></article>';
+      }).join("");
+    }
+
+    async function carregarObservacoes() {
+      resultadosGrid.innerHTML = '<p class="col-span-full rounded-xl border border-gray-200 bg-white p-5 text-sm text-gray-500 shadow-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando observacoes...</p>';
+
+      try {
+        const resposta = await fetch(API_BASE_URL + "/api/radar/observations");
+        if (!resposta.ok) {
+          throw new Error("Nao foi possivel carregar as observacoes.");
+        }
+        const dados = await resposta.json();
+        renderizarObservacoes(Array.isArray(dados.observations) ? dados.observations : []);
+      } catch (erro) {
+        resultadosGrid.innerHTML = '<p class="col-span-full rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">' + escaparHtml(erro.message) + '</p>';
+      }
+    }
 
     botaoMapear.addEventListener("click", async () => {
       const servico = document.getElementById("servico").value;
@@ -146,7 +204,7 @@
       botaoMapear.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
 
       try {
-        const resposta = await fetch("http://localhost:8000/api/radar/scan", {
+        const resposta = await fetch(API_BASE_URL + "/api/radar/scan", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -154,7 +212,7 @@
           body: JSON.stringify({
             keyword: servico,
             location: cidade,
-            device: dispositivo,
+            device: dispositivo.toLowerCase(),
           }),
         });
 
@@ -163,6 +221,7 @@
         }
 
         const dados = await resposta.json();
+        await carregarObservacoes();
         alert(`Varredura concluída! ${dados.ads_found} anúncios encontrados e salvos no banco.`);
       } catch (erro) {
         alert(`Falha na varredura: ${erro.message}`);
@@ -171,6 +230,8 @@
         botaoMapear.innerHTML = `${iconeOriginal} Mapear Concorrência`;
       }
     });
+
+    carregarObservacoes();
   </script>
 </body>
 </html>
