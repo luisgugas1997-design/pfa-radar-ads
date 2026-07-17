@@ -1,0 +1,176 @@
+import asyncio
+import os
+from types import SimpleNamespace
+from urllib.parse import quote
+
+import httpx
+import pytest
+
+
+os.environ.setdefault(
+    "DATABASE_URL",
+    "postgresql+asyncpg://radar:radar@127.0.0.1:5432/radar_test",
+)
+os.environ.setdefault("RADAR_ACCESS_USER", "radar-test")
+os.environ.setdefault("RADAR_ACCESS_PASSWORD", "senha-test")
+
+from backend.main import app
+from backend.services.dashboard_service import (
+    _assinatura_anuncio,
+    _nomes_historicos_do_servico,
+)
+from backend.services.orchestrator import extrair_url_destino
+from backend.services.scraper import capturar_landing_page
+from backend.services.search_planner import criar_plano_busca
+
+
+def test_plano_economico_nao_executa_e_calcula_creditos() -> None:
+    plano = criar_plano_busca(
+        service="Lei Seca",
+        locations="São Bernardo do Campo,Santo André",
+        devices="mobile",
+        mode="economico",
+    )
+
+    assert plano["estimated_credits"] == len(plano["matrix"])
+    assert plano["estimated_credits"] == 6
+    assert all(item["estimated_credits"] == 1 for item in plano["matrix"])
+
+
+def test_plano_completo_respeita_limite_de_24_creditos() -> None:
+    plano = criar_plano_busca(
+        service="Suspensão da CNH",
+        locations="São Bernardo do Campo,Santo André",
+        devices="mobile,desktop",
+        mode="completo",
+    )
+
+    assert plano["estimated_credits"] == 24
+    assert plano["limited"] is True
+    assert plano["omitted_keywords"]
+    assert {item["location"] for item in plano["matrix"]} == {
+        "São Bernardo do Campo",
+        "Santo André",
+    }
+    assert {item["device"] for item in plano["matrix"]} == {
+        "mobile",
+        "desktop",
+    }
+
+
+def test_plano_rejeita_dispositivo_invalido() -> None:
+    with pytest.raises(ValueError, match="Dispositivos aceitos"):
+        criar_plano_busca(
+            service="Lei Seca",
+            locations="Santos",
+            devices="televisao",
+            mode="economico",
+        )
+
+
+def test_assinatura_de_anuncio_e_estavel_entre_varreduras() -> None:
+    primeira = SimpleNamespace(
+        title="Defesa Lei Seca",
+        description="Análise do caso",
+        target_url="https://exemplo.com/lei-seca",
+    )
+    segunda = SimpleNamespace(
+        title="  DEFESA   LEI SECA ",
+        description="análise do caso",
+        target_url="https://exemplo.com/lei-seca",
+    )
+
+    assert _assinatura_anuncio(primeira) == _assinatura_anuncio(segunda)
+
+
+def test_assinatura_ignora_parametros_comuns_de_rastreamento() -> None:
+    primeira = SimpleNamespace(
+        title="Defesa Lei Seca",
+        description="Análise do caso",
+        target_url="https://exemplo.com/lei-seca?utm_source=google&gclid=abc",
+    )
+    segunda = SimpleNamespace(
+        title="Defesa Lei Seca",
+        description="Análise do caso",
+        target_url="https://exemplo.com/lei-seca",
+    )
+
+    assert _assinatura_anuncio(primeira) == _assinatura_anuncio(segunda)
+
+
+def test_filtro_de_servico_inclui_variacoes_historicas() -> None:
+    nomes = _nomes_historicos_do_servico("Lei Seca")
+
+    assert "lei seca" in nomes
+    assert "recusa bafômetro" in nomes
+    assert "recusa ao bafômetro" in nomes
+    assert "advogado lei seca" in nomes
+
+
+def test_extrai_destino_sem_expor_link_de_clique_google() -> None:
+    destino = "https://concorrente.example/landing?origem=radar"
+    rastreador = f"https://www.google.com/aclk?adurl={quote(destino, safe='')}"
+
+    assert extrair_url_destino(rastreador) == destino
+    assert extrair_url_destino("javascript:alert(1)") is None
+
+
+def test_scraper_rejeita_url_nao_http_sem_abrir_navegador() -> None:
+    resultado = asyncio.run(capturar_landing_page("file:///etc/passwd"))
+
+    assert resultado["status"] == "erro"
+    assert "HTTP" in resultado["erro"]
+
+
+def test_scraper_rejeita_endereco_privado_sem_abrir_navegador() -> None:
+    resultado = asyncio.run(capturar_landing_page("http://127.0.0.1/admin"))
+
+    assert resultado["status"] == "erro"
+    assert "público" in resultado["erro"]
+
+
+def test_endpoint_de_plano_reflete_o_contrato_publico() -> None:
+    async def executar() -> httpx.Response:
+        transporte = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transporte,
+            base_url="http://testserver",
+            auth=("radar-test", "senha-test"),
+        ) as cliente:
+            return await cliente.get(
+                "/api/radar/search-plan",
+                params={
+                    "service": "Lei Seca",
+                    "locations": "São Bernardo do Campo",
+                    "devices": "mobile",
+                    "mode": "economico",
+                },
+            )
+
+    resposta = asyncio.run(executar())
+
+    assert resposta.status_code == 200
+    corpo = resposta.json()
+    assert corpo["estimated_credits"] == len(corpo["matrix"])
+    assert corpo["estimated_credits"] > 0
+
+
+def test_endpoint_radar_rejeita_acesso_sem_credenciais() -> None:
+    async def executar() -> httpx.Response:
+        transporte = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transporte,
+            base_url="http://testserver",
+        ) as cliente:
+            return await cliente.get(
+                "/api/radar/search-plan",
+                params={
+                    "service": "Lei Seca",
+                    "locations": "São Bernardo do Campo",
+                },
+            )
+
+    resposta = asyncio.run(executar())
+
+    assert resposta.status_code == 401
+    assert resposta.headers["www-authenticate"] == 'Basic realm="Radar PFA"'

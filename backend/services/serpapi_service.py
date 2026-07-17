@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 SERPAPI_URL = "https://serpapi.com/search"
+SERPAPI_ACCOUNT_URL = "https://serpapi.com/account.json"
 logger = logging.getLogger("uvicorn.error")
 SERPAPI_LOCATION_IDS = {
     "sao bernardo do campo": "585069a2ee19ad271e9b4f84",
@@ -23,6 +24,13 @@ SERPAPI_LOCATION_IDS = {
 class ResultadoSerpApi:
     anuncios: list[dict[str, Any]]
     search_id: str | None
+
+
+def _inteiro_ou_none(valor: Any) -> int | None:
+    try:
+        return int(valor) if valor is not None else None
+    except (TypeError, ValueError):
+        return None
 
 
 def obter_localizacao_serpapi(location: str) -> str:
@@ -47,7 +55,9 @@ async def buscar_anuncios_google(
         "location": obter_localizacao_serpapi(location),
         "device": device,
         "api_key": api_key,
-        "hl": "pt",
+        "google_domain": "google.com.br",
+        "gl": "br",
+        "hl": "pt-br",
         "no_cache": "true",
     }
     params_para_log = {**params, "api_key": "[oculta]"}
@@ -92,3 +102,43 @@ async def buscar_anuncios_google(
         anuncios=[anuncio for anuncio in anuncios if isinstance(anuncio, dict)],
         search_id=metadados.get("id"),
     )
+
+
+async def obter_cota_serpapi() -> dict[str, Any]:
+    api_key = os.getenv("SERPAPI_KEY") or os.getenv("SERPAPI_API_KEY")
+    if not api_key:
+        raise RuntimeError("SERPAPI_KEY não está configurada no servidor.")
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.get(
+                SERPAPI_ACCOUNT_URL,
+                params={"api_key": api_key},
+            )
+            response.raise_for_status()
+            dados = response.json()
+    except httpx.HTTPStatusError as erro:
+        raise RuntimeError(
+            f"A SerpApi respondeu com HTTP {erro.response.status_code} ao consultar a cota."
+        ) from erro
+    except httpx.RequestError as erro:
+        raise RuntimeError("Falha de rede ao consultar a cota da SerpApi.") from erro
+    except ValueError as erro:
+        raise RuntimeError("A SerpApi retornou uma cota em formato inválido.") from erro
+
+    if not isinstance(dados, dict):
+        raise RuntimeError("A SerpApi retornou uma estrutura de cota inesperada.")
+    if dados.get("error"):
+        raise RuntimeError(f"Erro retornado pela SerpApi: {str(dados['error'])[:300]}")
+
+    restante = dados.get("total_searches_left")
+    if restante is None:
+        restante = dados.get("plan_searches_left")
+
+    return {
+        "status": "available",
+        "monthly_limit": _inteiro_ou_none(dados.get("searches_per_month")),
+        "used": _inteiro_ou_none(dados.get("this_month_usage")),
+        "remaining": _inteiro_ou_none(restante),
+        "renewal": dados.get("plan_renewal_date"),
+    }

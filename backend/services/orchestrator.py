@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from hashlib import sha256
 from urllib.parse import parse_qs, urlparse
 
@@ -53,11 +54,13 @@ async def executar_varredura(
     keyword: str,
     location: str,
     device: str,
+    service_name: str | None = None,
 ) -> SearchRun:
     search_run = SearchRun(
-        service_name=keyword,
+        service_name=(service_name or keyword).strip(),
         region_name=location,
         device=device,
+        keyword=keyword,
         status="pending",
     )
     session.add(search_run)
@@ -71,6 +74,7 @@ async def executar_varredura(
         search_run.provider_search_id = provider_search_id
         anuncios = resultado_serpapi.anuncios
         anuncios_persistidos = 0
+        landing_pages_capturadas: set[int] = set()
 
         for anuncio in anuncios:
             target_url = extrair_url_destino(anuncio.get("link"))
@@ -90,14 +94,15 @@ async def executar_varredura(
                     domain=dominio,
                 )
                 session.add(advertiser)
+            elif not advertiser.display_name and anuncio.get("source"):
+                advertiser.display_name = anuncio.get("source")
 
             landing_page = await session.scalar(
                 select(LandingPage).where(
                     LandingPage.canonical_url == target_url
                 )
             )
-            landing_page_nova = landing_page is None
-            if landing_page_nova:
+            if landing_page is None:
                 landing_page = LandingPage(
                     canonical_url=target_url,
                     domain=dominio,
@@ -106,19 +111,15 @@ async def executar_varredura(
 
             await session.flush()
 
-            possui_snapshot = await session.scalar(
-                select(LandingPageSnapshot.id).where(
-                    LandingPageSnapshot.landing_page_id == landing_page.id
-                ).limit(1)
-            )
             resultado_scraper = None
-            if landing_page_nova or possui_snapshot is None:
+            if landing_page.id not in landing_pages_capturadas:
+                landing_pages_capturadas.add(landing_page.id)
                 resultado_scraper = await capturar_landing_page(target_url)
 
             titulo = anuncio.get("title") or ""
             descricao = anuncio.get("description") or anuncio.get("snippet")
             fingerprint = sha256(
-                f"{search_run.id}|{titulo}|{descricao or ''}|{target_url}".encode()
+                f"{titulo}|{descricao or ''}|{target_url}".encode()
             ).hexdigest()
 
             observacao_existente = await session.scalar(
@@ -158,7 +159,7 @@ async def executar_varredura(
             session.add(observacao)
             await session.flush()
 
-            if resultado_scraper and resultado_scraper.get("status") == "sucesso":
+            if resultado_scraper:
                 whatsapp_links = resultado_scraper.get("whatsapp_links", [])
                 if not isinstance(whatsapp_links, list):
                     whatsapp_links = []
@@ -167,17 +168,36 @@ async def executar_varredura(
                 if not isinstance(h2, list):
                     h2 = []
 
+                captura_sucesso = resultado_scraper.get("status") == "sucesso"
                 session.add(
                     LandingPageSnapshot(
                         landing_page_id=landing_page.id,
                         ad_observation_id=observacao.id,
-                        capture_status="captured",
+                        capture_status="captured" if captura_sucesso else "failed",
                         original_url=target_url,
+                        final_url=resultado_scraper.get("final_url"),
+                        http_status=resultado_scraper.get("http_status"),
+                        page_title=resultado_scraper.get("page_title"),
+                        meta_description=resultado_scraper.get("meta_description"),
+                        canonical_url=resultado_scraper.get("canonical_url"),
                         h1=resultado_scraper.get("h1"),
                         h2=h2,
+                        headline=resultado_scraper.get("headline"),
+                        subtitle=resultado_scraper.get("subtitle"),
+                        primary_cta=resultado_scraper.get("primary_cta"),
                         whatsapp_url=whatsapp_links[0] if whatsapp_links else None,
                         whatsapp_links=whatsapp_links,
+                        form_fields=resultado_scraper.get("form_fields") or [],
+                        faq_entries=resultado_scraper.get("faq_entries") or [],
+                        social_proof=resultado_scraper.get("social_proof") or [],
+                        urgency_signals=resultado_scraper.get("urgency_signals") or [],
+                        authority_signals=resultado_scraper.get("authority_signals") or [],
                         screenshot_path=resultado_scraper.get("screenshot_path"),
+                        content_hash=resultado_scraper.get("content_hash"),
+                        dom_hash=resultado_scraper.get("dom_hash"),
+                        error_message=(
+                            None if captura_sucesso else resultado_scraper.get("erro")
+                        ),
                     )
                 )
 
@@ -185,6 +205,7 @@ async def executar_varredura(
 
         search_run.status = "completed"
         search_run.ads_found = anuncios_persistidos
+        search_run.completed_at = datetime.now(timezone.utc)
         await session.commit()
         await session.refresh(search_run)
         return search_run

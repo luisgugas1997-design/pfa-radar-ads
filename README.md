@@ -1,31 +1,54 @@
-# Painel de Controle PFA Advogados - Versão Visual
+# Radar Google Ads — PFA Advogados
 
-Este projeto é uma réplica interativa exata do design que você enviou para o Dashboard de Controle de IA e CRM da PFA Advogados.
+MVP sob demanda para observar anúncios públicos no Google, registrar histórico
+incremental e analisar as landing pages encontradas sem clicar em anúncios,
+preencher formulários ou enviar mensagens.
 
-## Como Visualizar Localmente (Sem instalações necessárias)
+## O que o painel mede
 
-Como estruturamos o código utilizando Javascript nativo e sem dependências complexas de compiladores, você pode abrir e testar no seu navegador com apenas 2 cliques!
+- concorrentes, anúncios únicos e aparições **observados** nas consultas executadas;
+- presença observada por anunciante, consulta, região e dispositivo;
+- histórico de anúncios e snapshots de landing pages;
+- headline, subtítulos, CTA, WhatsApp, formulários, FAQ e sinais textuais;
+- cobertura e data real da observação.
 
-1. Vá até a pasta: `C:\Users\Luiz\.gemini\antigravity\scratch\pfa-dashboard\`
-2. Dê dois cliques no arquivo **`index.html`** para abri-lo no seu navegador (Google Chrome, Edge, etc.).
-3. **Pronto!** Você verá a interface inteira rodando no seu navegador com todas as conversas, chat, abas de arquivos e Kanban ativos.
+Os números não representam investimento, participação de mercado, volume de busca
+nem o inventário completo de anúncios de uma empresa.
 
----
+## Controle de custo
 
-## O Que Está Funcionando Nesta Versão (Dados de Teste):
+Nenhuma busca roda automaticamente. O usuário seleciona serviço, regiões,
+dispositivo e modo, revisa a matriz e confirma. O planner limita cada plano a
+24 consultas e a API revalida o saldo da SerpApi antes de cada busca.
 
-- **Lista de Conversas (Esquerda):** Você pode clicar nos diferentes clientes (João da Silva, Maria Oliveira, Carlos Mendes, Cliente Lei Seca Teste) para trocar de chat.
-- **Painel Central (Chat):** Você pode digitar mensagens na barra inferior e enviar. Se o robô estiver ativo, ele vai te responder simulando a IA após 1 segundo!
-- **Parar / Retomar Robô:** Os botões no cabeçalho mudam o status do bot na hora, adicionando o evento na Linha do Tempo e alterando a barra de status verde/vermelha de resposta da IA.
-- **Abas de Arquivos (Embaixo):** A aba "Documentos" renderiza as pastas e os arquivos recebidos do cliente selecionado dinamicamente.
-- **Formulário CRM & Kanban (Direita):** Exibe as informações do CRM de acordo com o cliente que você clicar na lista. O Kanban destaca onde o cliente ativo está no funil de vendas.
-- **Editor de Prompts:** Você pode alterar o prompt personalizado e clicar em "Salvar Prompt".
+## Configuração
 
----
+Copie `backend/.env.example` para `backend/.env` somente no ambiente local ou
+configure estas variáveis no servidor:
 
-## Como Faremos a Conexão Real (Próxima Fase):
+```text
+DATABASE_URL=postgresql+asyncpg://usuario:senha@host:5432/banco
+SERPAPI_API_KEY=chave_da_serpapi
+RADAR_ACCESS_USER=usuario_do_painel
+RADAR_ACCESS_PASSWORD=senha_forte_do_painel
+```
 
-Na fase seguinte, conectaremos os botões e dados com a sua infraestrutura:
-1. **NocoDB:** As informações do formulário da direita e Kanban serão lidas e atualizadas diretamente na sua tabela do NocoDB via API.
-2. **Chatwoot:** A lista de conversas da esquerda e a janela de chat do centro serão sincronizadas em tempo real com as mensagens que chegam no Chatwoot.
-3. **n8n:** O fluxo do n8n que criamos anteriormente fará a ponte entre o WhatsApp (WAHA) e o Chatwoot/NocoDB.
+O arquivo `.env` é ignorado pelo Git e pelo contexto Docker.
+
+## Execução
+
+```bash
+pip install -r requirements.txt
+uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+
+Abra `http://localhost:8000/radar` e informe as credenciais HTTP Basic.
+
+## Validação
+
+```bash
+pytest -q
+```
+
+O container usa a imagem Playwright `v1.40.0-jammy`, e a mesma versão está
+fixada em `requirements.txt`.

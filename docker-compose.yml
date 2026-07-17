@@ -14,6 +14,8 @@ services:
       SERPAPI_API_KEY: ${SERPAPI_API_KEY}
       # Alias de compatibilidade: o serviço Python atual lê SERPAPI_KEY.
       SERPAPI_KEY: ${SERPAPI_API_KEY}
+      RADAR_ACCESS_USER: ${RADAR_ACCESS_USER}
+      RADAR_ACCESS_PASSWORD: ${RADAR_ACCESS_PASSWORD}
 
     volumes:
       - pfa_radar_screenshots:/app/screenshots

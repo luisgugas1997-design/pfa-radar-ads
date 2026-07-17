@@ -5,7 +5,12 @@ WORKDIR /app
 COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY --chown=pwuser:pwuser . .
+
+RUN mkdir -p /app/screenshots \
+    && chown -R pwuser:pwuser /app
+
+USER pwuser
 
 EXPOSE 8000
 
