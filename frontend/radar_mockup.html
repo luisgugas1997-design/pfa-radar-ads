@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Radar Google Ads | PFA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+  <aside class="fixed inset-y-0 left-0 w-64 bg-gray-900 px-4 py-6 text-gray-300">
+    <div class="mb-10 flex items-center gap-3 px-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-lg font-bold text-white">P</div>
+      <div>
+        <p class="text-sm font-semibold text-white">PFA Advogados</p>
+        <p class="text-xs text-gray-500">Painel de gestão</p>
+      </div>
+    </div>
+
+    <nav class="space-y-2">
+      <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm hover:bg-gray-800">
+        <i class="fa-solid fa-chart-pie w-5"></i>
+        Visão Geral
+      </a>
+      <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm hover:bg-gray-800">
+        <i class="fa-solid fa-users w-5"></i>
+        CRM
+      </a>
+      <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm hover:bg-gray-800">
+        <i class="fa-solid fa-scale-balanced w-5"></i>
+        Jurídico
+      </a>
+      <a href="#" class="flex items-center gap-3 rounded-lg bg-gray-700 px-3 py-2.5 text-sm font-semibold text-white shadow-sm">
+        <i class="fa-solid fa-radar w-5 text-blue-400"></i>
+        Radar Concorrência
+      </a>
+      <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm hover:bg-gray-800">
+        <i class="fa-solid fa-gear w-5"></i>
+        Configurações
+      </a>
+    </nav>
+  </aside>
+
+  <main class="ml-64 min-h-screen p-6 lg:p-10">
+    <header class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="mb-1 text-sm font-medium text-blue-600">Inteligência competitiva</p>
+        <h1 class="text-2xl font-bold tracking-tight text-gray-900">Radar Google Ads</h1>
+      </div>
+      <div class="inline-flex items-center gap-2 self-start rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700 sm:self-auto">
+        <i class="fa-solid fa-circle-check"></i>
+        Saldo SerpApi: 250 / 250 buscas
+      </div>
+    </header>
+
+    <section class="mb-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
+        <label class="block">
+          <span class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-500">Serviço</span>
+          <select id="servico" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+            <option>Lei Seca</option>
+            <option>Suspensão da CNH</option>
+            <option>Cassação da CNH</option>
+          </select>
+        </label>
+
+        <label class="block">
+          <span class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-500">Cidade</span>
+          <select id="cidade" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+            <option>São Bernardo do Campo</option>
+            <option>Santo André</option>
+            <option>São Paulo</option>
+          </select>
+        </label>
+
+        <label class="block">
+          <span class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-500">Dispositivo</span>
+          <select id="dispositivo" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+            <option>Mobile</option>
+            <option>Desktop</option>
+          </select>
+        </label>
+
+        <div class="flex items-end">
+          <button id="btn-mapear" type="button" class="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:cursor-not-allowed disabled:opacity-70">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Mapear Concorrência
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-gray-900">Resultados observados</h2>
+          <p class="text-sm text-gray-500">Exemplo visual de anúncio e landing page identificados.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <div class="relative h-44 bg-gray-200">
+            <div class="absolute inset-4 rounded-lg border border-gray-300 bg-gray-100">
+              <div class="h-7 rounded-t-lg border-b border-gray-300 bg-gray-300"></div>
+              <div class="space-y-3 p-4">
+                <div class="h-4 w-3/4 rounded bg-gray-300"></div>
+                <div class="h-3 w-full rounded bg-gray-200"></div>
+                <div class="h-3 w-5/6 rounded bg-gray-200"></div>
+              </div>
+            </div>
+            <span class="absolute right-3 top-3 rounded-full bg-lime-400 px-3 py-1 text-xs font-bold text-lime-950 shadow-sm">
+              <i class="fa-brands fa-whatsapp mr-1"></i>
+              WhatsApp Detectado
+            </span>
+          </div>
+
+          <div class="p-5">
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-600">Anúncio observado</p>
+            <h3 class="text-lg font-bold leading-snug text-gray-900">Defesa Lei Seca: Proteja sua CNH</h3>
+            <p class="mt-2 truncate text-sm text-gray-500">www.exemplo-advocacia.com.br/lei-seca</p>
+
+            <div class="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
+              <span class="text-xs text-gray-400">Mobile · São Bernardo</span>
+              <a href="#" class="text-sm font-semibold text-blue-600 hover:text-blue-800">
+                Ver Argumentos e Histórico
+                <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const botaoMapear = document.getElementById("btn-mapear");
+    const iconeOriginal = '<i class="fa-solid fa-magnifying-glass"></i>';
+
+    botaoMapear.addEventListener("click", async () => {
+      const servico = document.getElementById("servico").value;
+      const cidade = document.getElementById("cidade").value;
+      const dispositivo = document.getElementById("dispositivo").value;
+
+      botaoMapear.disabled = true;
+      botaoMapear.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+
+      try {
+        const resposta = await fetch("http://localhost:8000/api/radar/scan", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            keyword: servico,
+            location: cidade,
+            device: dispositivo,
+          }),
+        });
+
+        if (!resposta.ok) {
+          throw new Error("Não foi possível concluir a varredura.");
+        }
+
+        const dados = await resposta.json();
+        alert(`Varredura concluída! ${dados.ads_found} anúncios encontrados e salvos no banco.`);
+      } catch (erro) {
+        alert(`Falha na varredura: ${erro.message}`);
+      } finally {
+        botaoMapear.disabled = false;
+        botaoMapear.innerHTML = `${iconeOriginal} Mapear Concorrência`;
+      }
+    });
+  </script>
+</body>
+</html>
