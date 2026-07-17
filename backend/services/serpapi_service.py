@@ -8,6 +8,14 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 SERPAPI_URL = "https://serpapi.com/search"
+SERPAPI_LOCATION_IDS = {
+    "sao bernardo do campo": "585069a2ee19ad271e9b4f84",
+    "são bernardo do campo": "585069a2ee19ad271e9b4f84",
+}
+
+
+def obter_localizacao_serpapi(location: str) -> str:
+    return SERPAPI_LOCATION_IDS.get(location.strip().lower(), location)
 
 
 async def buscar_anuncios_google(
@@ -23,10 +31,10 @@ async def buscar_anuncios_google(
     params = {
         "engine": "google",
         "q": keyword,
-        "location": location,
+        "location": obter_localizacao_serpapi(location),
         "device": device,
         "api_key": api_key,
-        "hl": "pt",
+        "hl": "pt-br",
         "gl": "br",
     }
 
