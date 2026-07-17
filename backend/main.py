@@ -133,7 +133,7 @@ async def listar_observacoes(
 
 @app.get("/api/radar/dashboard", dependencies=RADAR_PROTEGIDO)
 async def obter_dashboard(
-    days: Literal[7, 30, 90] = Query(default=30),
+    days: int = Query(default=30),
     service: str | None = Query(default=None),
     location: str | None = Query(default=None),
     device: str | None = Query(default=None),

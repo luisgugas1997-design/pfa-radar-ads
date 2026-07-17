@@ -14,6 +14,7 @@ os.environ.setdefault(
 os.environ.setdefault("RADAR_ACCESS_USER", "radar-test")
 os.environ.setdefault("RADAR_ACCESS_PASSWORD", "senha-test")
 
+import backend.main as main_module
 from backend.main import app
 from backend.services.dashboard_service import (
     _assinatura_anuncio,
@@ -174,3 +175,27 @@ def test_endpoint_radar_rejeita_acesso_sem_credenciais() -> None:
 
     assert resposta.status_code == 401
     assert resposta.headers["www-authenticate"] == 'Basic realm="Radar PFA"'
+
+
+def test_endpoint_dashboard_aceita_periodo_de_30_dias(monkeypatch) -> None:
+    async def dashboard_falso(*_args, days: int, **_kwargs) -> dict:
+        return {"period_days": days}
+
+    monkeypatch.setattr(main_module, "construir_dashboard", dashboard_falso)
+
+    async def executar() -> httpx.Response:
+        transporte = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transporte,
+            base_url="http://testserver",
+            auth=("radar-test", "senha-test"),
+        ) as cliente:
+            return await cliente.get(
+                "/api/radar/dashboard",
+                params={"days": "30", "service": "Lei Seca"},
+            )
+
+    resposta = asyncio.run(executar())
+
+    assert resposta.status_code == 200
+    assert resposta.json() == {"period_days": 30}
