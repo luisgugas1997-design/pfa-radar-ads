@@ -90,45 +90,29 @@
       </div>
     </section>
 
+    <div id="mensagem-status" role="status" aria-live="polite" class="hidden"></div>
+
     <section>
-      <div class="mb-4 flex items-center justify-between">
+      <div class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 class="text-lg font-bold text-gray-900">Resultados observados</h2>
-          <p class="text-sm text-gray-500">Exemplo visual de anúncio e landing page identificados.</p>
+          <h2 id="resultados-titulo" class="text-lg font-bold text-gray-900">Histórico de observações</h2>
+          <p id="resultados-descricao" class="text-sm text-gray-500">Últimos anúncios observados em todas as pesquisas.</p>
+        </div>
+
+        <div role="group" aria-label="Visualização dos resultados" class="inline-flex self-start rounded-xl bg-gray-200 p-1">
+          <button id="aba-atual" type="button" aria-pressed="false" class="rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 transition hover:text-gray-900">
+            Resultado desta busca
+          </button>
+          <button id="aba-historico" type="button" aria-pressed="true" class="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm transition">
+            Histórico
+          </button>
         </div>
       </div>
 
-      <div id="resultados-grid" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <article id="observacao-exemplo" class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div class="relative h-44 bg-gray-200">
-            <div class="absolute inset-4 rounded-lg border border-gray-300 bg-gray-100">
-              <div class="h-7 rounded-t-lg border-b border-gray-300 bg-gray-300"></div>
-              <div class="space-y-3 p-4">
-                <div class="h-4 w-3/4 rounded bg-gray-300"></div>
-                <div class="h-3 w-full rounded bg-gray-200"></div>
-                <div class="h-3 w-5/6 rounded bg-gray-200"></div>
-              </div>
-            </div>
-            <span class="absolute right-3 top-3 rounded-full bg-lime-400 px-3 py-1 text-xs font-bold text-lime-950 shadow-sm">
-              <i class="fa-brands fa-whatsapp mr-1"></i>
-              WhatsApp Detectado
-            </span>
-          </div>
-
-          <div class="p-5">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-600">Anúncio observado</p>
-            <h3 class="text-lg font-bold leading-snug text-gray-900">Defesa Lei Seca: Proteja sua CNH</h3>
-            <p class="mt-2 truncate text-sm text-gray-500">www.exemplo-advocacia.com.br/lei-seca</p>
-
-            <div class="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
-              <span class="text-xs text-gray-400">Mobile · São Bernardo</span>
-              <a href="#" class="text-sm font-semibold text-blue-600 hover:text-blue-800">
-                Ver Argumentos e Histórico
-                <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
-              </a>
-            </div>
-          </div>
-        </article>
+      <div id="resultados-grid" aria-live="polite" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <p class="col-span-full rounded-xl border border-gray-200 bg-white p-5 text-sm text-gray-500 shadow-sm">
+          <i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando observações...
+        </p>
       </div>
     </section>
   </main>
@@ -138,61 +122,190 @@
     const botaoMapear = document.getElementById("btn-mapear");
     const iconeOriginal = '<i class="fa-solid fa-magnifying-glass"></i>';
     const resultadosGrid = document.getElementById("resultados-grid");
+    const resultadosTitulo = document.getElementById("resultados-titulo");
+    const resultadosDescricao = document.getElementById("resultados-descricao");
+    const mensagemStatus = document.getElementById("mensagem-status");
+    const abaAtual = document.getElementById("aba-atual");
+    const abaHistorico = document.getElementById("aba-historico");
+    const idArmazenado = Number(sessionStorage.getItem("pfaRadarSearchRunId"));
+    let searchRunAtualId = Number.isSafeInteger(idArmazenado) && idArmazenado > 0
+      ? idArmazenado
+      : null;
+    if (!searchRunAtualId) {
+      sessionStorage.removeItem("pfaRadarSearchRunId");
+    }
+    let modoAtivo = searchRunAtualId ? "atual" : "historico";
+    let sequenciaCarregamento = 0;
 
     function escaparHtml(valor) {
-      return String(valor || "").replace(/[&<>\"]/g, (caractere) => ({
+      return String(valor || "").replace(/[&<>\"']/g, (caractere) => ({
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
         '"': "&quot;",
+        "'": "&#039;",
       })[caractere]);
     }
 
-    function renderizarObservacoes(observacoes) {
+    function obterUrlSegura(valor) {
+      try {
+        const url = new URL(String(valor || ""));
+        if (!['http:', 'https:'].includes(url.protocol)) {
+          return null;
+        }
+        return escaparHtml(url.href);
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function mostrarStatus(mensagem, tipo = "sucesso") {
+      const cores = {
+        erro: "border-red-200 bg-red-50 text-red-700",
+        processando: "border-blue-200 bg-blue-50 text-blue-700",
+        sucesso: "border-green-200 bg-green-50 text-green-700",
+      };
+      mensagemStatus.className = `mb-6 rounded-xl border px-4 py-3 text-sm font-medium ${cores[tipo] || cores.sucesso}`;
+      mensagemStatus.textContent = mensagem;
+    }
+
+    function atualizarAbas() {
+      const atualSelecionada = modoAtivo === "atual";
+      const classeBase = "rounded-lg px-3 py-2 text-sm font-semibold transition";
+      const classeAtiva = "bg-white text-gray-900 shadow-sm";
+      const classeInativa = "text-gray-600 hover:text-gray-900";
+
+      abaAtual.className = `${classeBase} ${atualSelecionada ? classeAtiva : classeInativa}`;
+      abaHistorico.className = `${classeBase} ${atualSelecionada ? classeInativa : classeAtiva}`;
+      abaAtual.setAttribute("aria-pressed", String(atualSelecionada));
+      abaHistorico.setAttribute("aria-pressed", String(!atualSelecionada));
+    }
+
+    function atualizarCabecalho(busca = null, totalExibido = null) {
+      if (modoAtivo === "historico") {
+        resultadosTitulo.textContent = "Histórico de observações";
+        resultadosDescricao.textContent = "Últimos anúncios observados em todas as pesquisas.";
+        return;
+      }
+
+      resultadosTitulo.textContent = "Resultado desta busca";
+      if (!busca) {
+        resultadosDescricao.textContent = "Faça uma pesquisa para visualizar somente os anúncios encontrados nela.";
+        return;
+      }
+
+      const total = Number.isSafeInteger(totalExibido)
+        ? totalExibido
+        : Number(busca.ads_found) || 0;
+      const rotuloTotal = total === 1 ? "1 anúncio observado" : `${total} anúncios observados`;
+      resultadosDescricao.textContent = [
+        busca.keyword,
+        busca.location,
+        busca.device,
+        rotuloTotal,
+      ].filter(Boolean).join(" · ");
+    }
+
+    function renderizarObservacoes(observacoes, mensagemVazia) {
       if (!observacoes.length) {
-        resultadosGrid.innerHTML = '<p class="col-span-full rounded-xl border border-dashed border-gray-300 bg-white p-5 text-sm text-gray-500">Nenhuma observacao encontrada. Faca uma busca para iniciar o historico.</p>';
+        resultadosGrid.innerHTML = '<p class="col-span-full rounded-xl border border-dashed border-gray-300 bg-white p-5 text-sm text-gray-500">' + escaparHtml(mensagemVazia) + '</p>';
         return;
       }
 
       resultadosGrid.innerHTML = observacoes.map((observacao) => {
-        const titulo = escaparHtml(observacao.title || "Anuncio sem titulo");
-        const descricao = escaparHtml(observacao.description || "Sem descricao disponivel.");
+        const titulo = escaparHtml(observacao.title || "Anúncio sem título");
+        const descricao = escaparHtml(observacao.description || "Sem descrição disponível.");
         const anunciante = escaparHtml(observacao.advertiser || observacao.domain);
         const dominio = escaparHtml(observacao.domain || observacao.target_url);
-        const dispositivo = escaparHtml(observacao.device || "nao informado");
+        const contexto = [observacao.keyword, observacao.location, observacao.device]
+          .filter(Boolean)
+          .map(escaparHtml)
+          .join(" · ");
         const data = observacao.observed_at
           ? new Date(observacao.observed_at).toLocaleString("pt-BR")
-          : "Data nao informada";
-        const url = encodeURI(observacao.target_url || "#");
+          : "Data não informada";
+        const url = obterUrlSegura(observacao.target_url);
+        const linkLanding = url
+          ? '<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="shrink-0 text-sm font-semibold text-blue-600 hover:text-blue-800">Abrir landing page <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-xs"></i></a>'
+          : '<span class="shrink-0 text-xs font-medium text-gray-400">Landing indisponível</span>';
 
         return '<article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">'
           + '<div class="bg-gradient-to-br from-slate-800 to-slate-600 p-5 text-white">'
           + '<p class="text-xs font-semibold uppercase tracking-wide text-blue-200">' + anunciante + '</p>'
           + '<p class="mt-2 text-sm text-slate-200">' + descricao + '</p>'
           + '</div><div class="p-5">'
-          + '<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-600">Anuncio observado</p>'
+          + '<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-600">Anúncio observado</p>'
           + '<h3 class="text-lg font-bold leading-snug text-gray-900">' + titulo + '</h3>'
           + '<p class="mt-2 truncate text-sm text-gray-500">' + dominio + '</p>'
-          + '<div class="mt-5 flex items-center justify-between gap-3 border-t border-gray-100 pt-4">'
-          + '<span class="text-xs text-gray-400">' + dispositivo + ' - ' + data + '</span>'
-          + '<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="shrink-0 text-sm font-semibold text-blue-600 hover:text-blue-800">Abrir landing page <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-xs"></i></a>'
+          + '<p class="mt-3 text-xs font-medium text-gray-500">' + contexto + '</p>'
+          + '<div class="mt-4 flex items-center justify-between gap-3 border-t border-gray-100 pt-4">'
+          + '<span class="text-xs text-gray-400">' + data + '</span>'
+          + linkLanding
           + '</div></div></article>';
       }).join("");
     }
 
-    async function carregarObservacoes() {
-      resultadosGrid.innerHTML = '<p class="col-span-full rounded-xl border border-gray-200 bg-white p-5 text-sm text-gray-500 shadow-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando observacoes...</p>';
+    async function carregarObservacoes(searchRunId = null) {
+      const requisicaoId = ++sequenciaCarregamento;
+      resultadosGrid.innerHTML = '<p class="col-span-full rounded-xl border border-gray-200 bg-white p-5 text-sm text-gray-500 shadow-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando observações...</p>';
 
       try {
-        const resposta = await fetch(API_BASE_URL + "/api/radar/observations");
+        const filtro = searchRunId ? `?search_run_id=${encodeURIComponent(searchRunId)}` : "";
+        const resposta = await fetch(API_BASE_URL + "/api/radar/observations" + filtro);
         if (!resposta.ok) {
-          throw new Error("Nao foi possivel carregar as observacoes.");
+          if (requisicaoId !== sequenciaCarregamento) {
+            return { ok: false, cancelada: true };
+          }
+          if (resposta.status === 404 && searchRunId) {
+            if (searchRunAtualId === searchRunId) {
+              searchRunAtualId = null;
+              sessionStorage.removeItem("pfaRadarSearchRunId");
+            }
+            atualizarCabecalho();
+            renderizarObservacoes([], "A pesquisa anterior não está mais disponível. Faça uma nova pesquisa.");
+            return { ok: false, removida: true };
+          }
+          throw new Error("Não foi possível carregar as observações.");
         }
         const dados = await resposta.json();
-        renderizarObservacoes(Array.isArray(dados.observations) ? dados.observations : []);
+        if (requisicaoId !== sequenciaCarregamento) {
+          return { ok: false, cancelada: true };
+        }
+        const observacoes = Array.isArray(dados.observations) ? dados.observations : [];
+        if (searchRunId) {
+          atualizarCabecalho(dados.search_run, observacoes.length);
+        }
+        renderizarObservacoes(
+          observacoes,
+          searchRunId
+            ? "Nenhum anúncio foi observado nesta pesquisa."
+            : "Ainda não há observações no histórico.",
+        );
+        return { ok: true, total: observacoes.length };
       } catch (erro) {
+        if (requisicaoId !== sequenciaCarregamento) {
+          return { ok: false, cancelada: true };
+        }
         resultadosGrid.innerHTML = '<p class="col-span-full rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">' + escaparHtml(erro.message) + '</p>';
+        return { ok: false, erro };
       }
+    }
+
+    async function selecionarModo(novoModo) {
+      modoAtivo = novoModo;
+      atualizarAbas();
+      atualizarCabecalho();
+
+      if (modoAtivo === "atual") {
+        if (!searchRunAtualId) {
+          sequenciaCarregamento += 1;
+          renderizarObservacoes([], "Faça uma pesquisa para visualizar os resultados atuais.");
+          return { ok: true, total: 0 };
+        }
+        return carregarObservacoes(searchRunAtualId);
+      }
+
+      return carregarObservacoes();
     }
 
     botaoMapear.addEventListener("click", async () => {
@@ -201,7 +314,9 @@
       const dispositivo = document.getElementById("dispositivo").value;
 
       botaoMapear.disabled = true;
+      botaoMapear.setAttribute("aria-busy", "true");
       botaoMapear.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+      mostrarStatus("Varredura em andamento. Aguarde a coleta dos anúncios e landing pages.", "processando");
 
       try {
         const resposta = await fetch(API_BASE_URL + "/api/radar/scan", {
@@ -221,17 +336,29 @@
         }
 
         const dados = await resposta.json();
-        await carregarObservacoes();
-        alert(`Varredura concluída! ${dados.ads_found} anúncios encontrados e salvos no banco.`);
+        const novoSearchRunId = Number(dados.search_run_id);
+        if (!Number.isSafeInteger(novoSearchRunId) || novoSearchRunId <= 0) {
+          throw new Error("A API não retornou um identificador de pesquisa válido.");
+        }
+        searchRunAtualId = novoSearchRunId;
+        sessionStorage.setItem("pfaRadarSearchRunId", String(searchRunAtualId));
+        const carregamento = await selecionarModo("atual");
+        if (!carregamento.ok) {
+          throw new Error("A varredura foi salva, mas os resultados não puderam ser carregados.");
+        }
+        mostrarStatus(`Varredura concluída: ${carregamento.total} anúncios exibidos nesta pesquisa.`);
       } catch (erro) {
-        alert(`Falha na varredura: ${erro.message}`);
+        mostrarStatus(`Falha na varredura: ${erro.message}`, "erro");
       } finally {
         botaoMapear.disabled = false;
+        botaoMapear.setAttribute("aria-busy", "false");
         botaoMapear.innerHTML = `${iconeOriginal} Mapear Concorrência`;
       }
     });
 
-    carregarObservacoes();
+    abaAtual.addEventListener("click", () => selecionarModo("atual"));
+    abaHistorico.addEventListener("click", () => selecionarModo("historico"));
+    selecionarModo(modoAtivo);
   </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -50,8 +50,15 @@ async def radar_frontend() -> FileResponse:
 
 @app.get("/api/radar/observations")
 async def listar_observacoes(
+    search_run_id: int | None = Query(default=None, ge=1),
     db: AsyncSession = Depends(get_db),
 ) -> dict:
+    busca_selecionada = None
+    if search_run_id is not None:
+        busca_selecionada = await db.get(SearchRun, search_run_id)
+        if busca_selecionada is None:
+            raise HTTPException(status_code=404, detail="Pesquisa não encontrada.")
+
     consulta = (
         select(AdObservation, Advertiser, LandingPage, SearchRun)
         .join(Advertiser, AdObservation.advertiser_id == Advertiser.id)
@@ -60,16 +67,22 @@ async def listar_observacoes(
         .order_by(AdObservation.observed_at.desc())
         .limit(100)
     )
+    if search_run_id is not None:
+        consulta = consulta.where(AdObservation.search_run_id == search_run_id)
+
     resultado = await db.execute(consulta)
 
     observacoes = [
         {
             "id": observacao.id,
+            "search_run_id": busca.id,
             "advertiser": anunciante.display_name or anunciante.domain,
             "domain": anunciante.domain,
             "title": observacao.title,
             "description": observacao.description,
             "position": observacao.position_index,
+            "keyword": busca.keyword or busca.service_name,
+            "location": busca.region_name,
             "device": busca.device,
             "target_url": observacao.target_url,
             "landing_page_url": pagina.canonical_url if pagina else None,
@@ -78,7 +91,19 @@ async def listar_observacoes(
         for observacao, anunciante, pagina, busca in resultado.all()
     ]
 
-    return {"observations": observacoes}
+    busca_atual = None
+    if busca_selecionada is not None:
+        busca_atual = {
+            "id": busca_selecionada.id,
+            "keyword": busca_selecionada.keyword or busca_selecionada.service_name,
+            "location": busca_selecionada.region_name,
+            "device": busca_selecionada.device,
+            "status": busca_selecionada.status,
+            "ads_found": busca_selecionada.ads_found,
+            "requested_at": busca_selecionada.requested_at,
+        }
+
+    return {"search_run": busca_atual, "observations": observacoes}
 
 
 @app.post("/api/radar/scan")
