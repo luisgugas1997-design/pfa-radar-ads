@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light">
+  <script>
+    if (window.location.protocol === "file:") {
+      window.location.replace("https://chatwoot-radar-api.phqoes.easypanel.host/radar");
+    }
+  </script>
   <title>Radar de Inteligência Google Ads | PFA</title>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -505,7 +510,7 @@
     "use strict";
 
     const API_BASE_URL = window.location.protocol === "file:"
-      ? "http://localhost:8000"
+      ? "https://chatwoot-radar-api.phqoes.easypanel.host"
       : window.location.origin;
 
     const SERVICE_VARIANTS = {
