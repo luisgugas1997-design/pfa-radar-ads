@@ -15,6 +15,7 @@ os.environ.setdefault("RADAR_ACCESS_USER", "radar-test")
 os.environ.setdefault("RADAR_ACCESS_PASSWORD", "senha-test")
 
 import backend.main as main_module
+import backend.services.orchestrator as orchestrator_module
 from backend.main import app
 from backend.services.dashboard_service import (
     _assinatura_anuncio,
@@ -199,3 +200,69 @@ def test_endpoint_dashboard_aceita_periodo_de_30_dias(monkeypatch) -> None:
 
     assert resposta.status_code == 200
     assert resposta.json() == {"period_days": 30}
+
+
+def test_orquestrador_preserva_erro_original_apos_rollback(monkeypatch) -> None:
+    class SearchRunFalso:
+        def __init__(self, **dados) -> None:
+            self.__dict__.update(dados)
+            self._id = None
+            self.expirado = False
+            self.error_message = None
+            self.provider_search_id = None
+
+        @property
+        def id(self):
+            if self.expirado:
+                raise RuntimeError("objeto expirado")
+            return self._id
+
+        @id.setter
+        def id(self, valor) -> None:
+            self._id = valor
+
+    class SessaoFalsa:
+        def __init__(self) -> None:
+            self.search_run = None
+
+        def add(self, objeto) -> None:
+            self.search_run = objeto
+
+        async def commit(self) -> None:
+            return None
+
+        async def refresh(self, objeto) -> None:
+            objeto.id = 42
+
+        async def rollback(self) -> None:
+            self.search_run.expirado = True
+
+        async def get(self, _model, identificador):
+            assert identificador == 42
+            self.search_run.expirado = False
+            return self.search_run
+
+    async def busca_com_falha(*_args, **_kwargs):
+        raise RuntimeError("erro original da coleta")
+
+    monkeypatch.setattr(orchestrator_module, "SearchRun", SearchRunFalso)
+    monkeypatch.setattr(
+        orchestrator_module,
+        "buscar_anuncios_google",
+        busca_com_falha,
+    )
+    sessao = SessaoFalsa()
+
+    with pytest.raises(RuntimeError, match="erro original da coleta"):
+        asyncio.run(
+            orchestrator_module.executar_varredura(
+                sessao,
+                "defesa lei seca",
+                "São Bernardo do Campo",
+                "mobile",
+                service_name="Lei Seca",
+            )
+        )
+
+    assert sessao.search_run.status == "failed"
+    assert sessao.search_run.error_message == "erro original da coleta"

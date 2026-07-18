@@ -66,6 +66,7 @@ async def executar_varredura(
     session.add(search_run)
     await session.commit()
     await session.refresh(search_run)
+    search_run_id = search_run.id
 
     provider_search_id = None
     try:
@@ -212,7 +213,7 @@ async def executar_varredura(
 
     except Exception as erro:
         await session.rollback()
-        search_run_falhou = await session.get(SearchRun, search_run.id)
+        search_run_falhou = await session.get(SearchRun, search_run_id)
         if search_run_falhou is None:
             raise
 
