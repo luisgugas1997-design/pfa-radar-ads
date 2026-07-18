@@ -4,6 +4,1357 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light">
+  <script>
+    if (window.location.protocol === "file:") {
+      window.location.replace("https://chatwoot-radar-api.phqoes.easypanel.host/radar");
+    }
+  </script>
+  <title>Radar de Inteligência Google Ads | PFA</title>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --navy-950: #08111f;
+      --navy-900: #0d1829;
+      --navy-800: #17253a;
+      --blue-700: #1d4ed8;
+      --blue-600: #2563eb;
+      --blue-100: #dbeafe;
+      --blue-50: #eff6ff;
+      --slate-950: #0f172a;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-400: #94a3b8;
+      --slate-300: #cbd5e1;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --green-700: #15803d;
+      --green-100: #dcfce7;
+      --amber-800: #92400e;
+      --amber-100: #fef3c7;
+      --red-700: #b91c1c;
+      --red-100: #fee2e2;
+      --white: #fff;
+      --radius: 18px;
+      --shadow: 0 14px 34px rgba(15, 23, 42, .07);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: #f5f7fb;
+      color: var(--slate-950);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid rgba(37, 99, 235, .35); outline-offset: 2px; }
+    [hidden] { display: none !important; }
+    .skip-link { position: fixed; left: 12px; top: -60px; z-index: 100; background: #fff; padding: 10px 14px; border-radius: 8px; }
+    .skip-link:focus { top: 12px; }
+
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; z-index: 50; width: 272px;
+      display: flex; flex-direction: column; padding: 24px 18px;
+      color: #cbd5e1; background: linear-gradient(180deg, var(--navy-950), var(--navy-900));
+    }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 4px 8px 24px; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .brand-mark { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; color: #fff; font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .brand strong { display: block; color: #fff; font-size: 15px; }
+    .brand small { color: #7f91aa; }
+    .nav-label { margin: 24px 10px 8px; color: #64748b; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .nav-list { display: grid; gap: 5px; }
+    .nav-link { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 11px; color: #aebdd0; text-decoration: none; font-size: 14px; font-weight: 600; }
+    .nav-link:hover { background: rgba(255,255,255,.06); color: #fff; }
+    .nav-link.active { color: #fff; background: linear-gradient(90deg, rgba(37,99,235,.34), rgba(37,99,235,.12)); box-shadow: inset 3px 0 #60a5fa; }
+    .nav-link i { width: 20px; text-align: center; }
+    .sidebar-note { margin-top: auto; padding: 14px; border: 1px solid rgba(148,163,184,.15); border-radius: 14px; background: rgba(15,23,42,.5); }
+    .sidebar-note strong { display: block; color: #fff; font-size: 12px; }
+    .sidebar-note span { display: block; margin-top: 4px; color: #8292a8; font-size: 11px; }
+
+    .mobile-header { display: none; }
+    .overlay { display: none; position: fixed; inset: 0; z-index: 45; background: rgba(2,6,23,.55); }
+    .main { margin-left: 272px; min-height: 100vh; }
+    .content { width: min(1500px, 100%); margin: 0 auto; padding: 34px 34px 80px; }
+
+    .hero { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+    .eyebrow { margin: 0 0 7px; color: var(--blue-600); font-size: 12px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 8px; font-size: clamp(28px, 3vw, 40px); line-height: 1.08; letter-spacing: -.035em; }
+    .hero-copy { max-width: 740px; margin: 0; color: var(--slate-600); font-size: 15px; }
+    .hero-meta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 9px; }
+    .pill { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 8px 12px; border: 1px solid var(--slate-200); border-radius: 999px; background: #fff; color: var(--slate-600); font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .pill.success { border-color: #bbf7d0; color: var(--green-700); background: #f0fdf4; }
+    .pill.warning { border-color: #fde68a; color: var(--amber-800); background: #fffbeb; }
+    .pill.error { border-color: #fecaca; color: var(--red-700); background: #fff1f2; }
+
+    .card { border: 1px solid var(--slate-200); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
+    .planner { margin-bottom: 24px; overflow: hidden; }
+    .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 20px 22px; border-bottom: 1px solid var(--slate-200); }
+    .card-header h2 { margin-bottom: 3px; font-size: 17px; letter-spacing: -.01em; }
+    .card-header p { margin-bottom: 0; color: var(--slate-500); font-size: 12px; }
+    .planner-body { padding: 20px 22px 22px; }
+    .period-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    .field-label { display: block; margin-bottom: 7px; color: var(--slate-600); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .segmented { display: inline-flex; padding: 3px; border-radius: 11px; background: var(--slate-100); }
+    .segment { border: 0; border-radius: 8px; padding: 7px 13px; color: var(--slate-500); background: transparent; cursor: pointer; font-size: 12px; font-weight: 800; }
+    .segment.active { color: var(--blue-700); background: #fff; box-shadow: 0 2px 8px rgba(15,23,42,.08); }
+    .filters { display: grid; grid-template-columns: 1.1fr 1.4fr .8fr 1.35fr; gap: 14px; align-items: start; }
+    .control { width: 100%; min-height: 45px; border: 1px solid var(--slate-300); border-radius: 11px; padding: 0 12px; color: var(--slate-950); background: #fff; }
+    .control:hover { border-color: #94a3b8; }
+    .region-select { position: relative; }
+    .region-select summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 45px; border: 1px solid var(--slate-300); border-radius: 11px; padding: 10px 12px; cursor: pointer; list-style: none; background: #fff; font-size: 13px; }
+    .region-select summary span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .region-select summary::-webkit-details-marker { display: none; }
+    .region-select[open] summary { border-color: var(--blue-600); box-shadow: 0 0 0 3px var(--blue-100); }
+    .region-menu { position: absolute; z-index: 20; top: calc(100% + 6px); left: 0; width: min(360px, 88vw); padding: 10px; border: 1px solid var(--slate-200); border-radius: 13px; background: #fff; box-shadow: 0 18px 40px rgba(15,23,42,.16); }
+    .check-row { display: flex; align-items: center; gap: 9px; padding: 8px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+    .check-row:hover { background: var(--slate-50); }
+    .check-row input { width: 17px; height: 17px; accent-color: var(--blue-600); }
+    .region-add { display: grid; grid-template-columns: 1fr auto; gap: 7px; margin-top: 7px; padding-top: 10px; border-top: 1px solid var(--slate-200); }
+    .region-add input { min-width: 0; min-height: 38px; border: 1px solid var(--slate-300); border-radius: 9px; padding: 0 10px; }
+    .region-add button { min-height: 38px; border: 0; border-radius: 9px; padding: 0 11px; color: var(--blue-700); background: var(--blue-100); cursor: pointer; font-weight: 800; }
+    .mode-options { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .mode-option { position: relative; }
+    .mode-option input { position: absolute; opacity: 0; pointer-events: none; }
+    .mode-option span { display: block; min-height: 45px; padding: 8px 10px; border: 1px solid var(--slate-300); border-radius: 11px; cursor: pointer; }
+    .mode-option b { display: block; font-size: 12px; }
+    .mode-option small { display: block; margin-top: 1px; color: var(--slate-500); font-size: 10px; }
+    .mode-option input:checked + span { border-color: var(--blue-600); color: var(--blue-700); background: var(--blue-50); box-shadow: 0 0 0 2px var(--blue-100); }
+    .mode-option input:focus-visible + span { outline: 3px solid rgba(37, 99, 235, .35); outline-offset: 2px; }
+    .plan-preview { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; margin-top: 18px; padding: 15px 16px; border: 1px solid #c7d2fe; border-radius: 14px; background: linear-gradient(100deg, #f5f7ff, #eff6ff); }
+    .plan-main { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .plan-icon { display: grid; place-items: center; flex: 0 0 auto; width: 42px; height: 42px; border-radius: 12px; color: var(--blue-700); background: #dbeafe; }
+    .plan-main strong { display: block; font-size: 14px; }
+    .plan-main p { margin: 2px 0 0; color: var(--slate-600); font-size: 12px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; border: 0; border-radius: 11px; padding: 10px 15px; cursor: pointer; font-size: 13px; font-weight: 800; text-decoration: none; transition: .18s ease; }
+    .button:hover { transform: translateY(-1px); }
+    .button:disabled { cursor: not-allowed; opacity: .55; transform: none; }
+    .button.primary { color: #fff; background: var(--blue-600); box-shadow: 0 8px 18px rgba(37,99,235,.22); }
+    .button.primary:hover { background: var(--blue-700); }
+    .button.secondary { border: 1px solid var(--slate-300); color: var(--slate-700); background: #fff; }
+    .button.ghost { min-height: 34px; padding: 7px 10px; color: var(--blue-700); background: var(--blue-50); font-size: 11px; }
+    .button.danger { border: 1px solid #fecaca; color: var(--red-700); background: #fff1f2; }
+    .progress-panel { margin-top: 14px; padding: 16px; border: 1px solid var(--slate-200); border-radius: 14px; background: var(--slate-50); }
+    .progress-head { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 10px; font-size: 12px; font-weight: 700; }
+    .progress-track { height: 8px; overflow: hidden; border-radius: 999px; background: var(--slate-200); }
+    .progress-bar { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #2563eb, #60a5fa); transition: width .25s ease; }
+    .progress-detail { margin: 9px 0 0; color: var(--slate-500); font-size: 11px; }
+
+    .status { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; padding: 13px 15px; border-radius: 13px; font-size: 13px; }
+    .status.info { border: 1px solid #bfdbfe; color: #1e40af; background: #eff6ff; }
+    .status.success { border: 1px solid #bbf7d0; color: #166534; background: #f0fdf4; }
+    .status.error { border: 1px solid #fecaca; color: #991b1b; background: #fff1f2; }
+
+    .section { margin-top: 24px; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 13px; }
+    .section-heading h2 { margin-bottom: 3px; font-size: 19px; letter-spacing: -.018em; }
+    .section-heading p { margin-bottom: 0; color: var(--slate-500); font-size: 12px; }
+    .source-line { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; color: var(--slate-500); font-size: 10px; }
+    .tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px; border-radius: 6px; font-size: 9px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .tag.collected { color: #075985; background: #e0f2fe; }
+    .tag.derived { color: #6d28d9; background: #ede9fe; }
+    .tag.warning { color: #92400e; background: #fef3c7; }
+    .confidence { font-weight: 800; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+    .coverage-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 12px; padding: 10px 13px; border: 1px solid var(--slate-200); border-radius: 12px; color: var(--slate-600); background: rgba(255,255,255,.72); font-size: 10px; }
+    .coverage-strip b { color: var(--slate-950); }
+    .kpi { min-height: 150px; padding: 17px; border: 1px solid var(--slate-200); border-radius: 15px; background: #fff; }
+    .kpi-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .kpi-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; color: var(--blue-700); background: var(--blue-50); }
+    .kpi-value { margin: 14px 0 2px; font-size: 27px; font-weight: 850; line-height: 1; letter-spacing: -.04em; }
+    .kpi-label { margin: 0; color: var(--slate-600); font-size: 12px; font-weight: 700; }
+    .kpi .source-line { margin-top: 12px; }
+    .skeleton { position: relative; overflow: hidden; color: transparent !important; border-radius: 7px; background: var(--slate-100); }
+    .skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,.8), transparent); animation: shimmer 1.4s infinite; }
+    @keyframes shimmer { to { transform: translateX(100%); } }
+
+    .overview-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 14px; }
+    .panel { padding: 20px; }
+    .panel-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
+    .panel-title h3 { margin-bottom: 0; font-size: 15px; }
+    .insight-list { display: grid; gap: 10px; }
+    .insight { display: grid; grid-template-columns: 32px 1fr; gap: 11px; padding: 12px; border: 1px solid var(--slate-200); border-radius: 12px; background: var(--slate-50); }
+    .insight-number { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 9px; color: var(--blue-700); background: var(--blue-100); font-size: 11px; font-weight: 900; }
+    .insight p { margin-bottom: 7px; color: var(--slate-700); font-size: 12px; }
+    .trend-chart { display: flex; align-items: end; gap: 7px; min-height: 210px; padding: 26px 4px 0; border-bottom: 1px solid var(--slate-200); }
+    .trend-column { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-end; height: 180px; min-width: 12px; }
+    .trend-value { margin-bottom: 4px; color: var(--slate-500); font-size: 9px; font-weight: 700; }
+    .trend-bar { width: min(32px, 75%); min-height: 3px; border-radius: 7px 7px 2px 2px; background: linear-gradient(180deg, #3b82f6, #1d4ed8); }
+    .trend-label { margin-top: 7px; color: var(--slate-400); font-size: 8px; white-space: nowrap; }
+
+    .rank-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 14px; }
+    .ranking { list-style: none; margin: 0; padding: 0; }
+    .rank-row { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 11px; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--slate-100); }
+    .rank-row:last-child { border-bottom: 0; }
+    .rank-pos { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; color: var(--slate-600); background: var(--slate-100); font-size: 11px; font-weight: 900; }
+    .rank-row:first-child .rank-pos { color: #92400e; background: #fef3c7; }
+    .rank-name { overflow: hidden; }
+    .rank-name strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+    .rank-name span { display: block; margin-top: 2px; color: var(--slate-500); font-size: 10px; }
+    .rank-metrics { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+    .metric-mini { min-width: 55px; text-align: right; }
+    .metric-mini b { display: block; font-size: 12px; }
+    .metric-mini small { display: block; color: var(--slate-400); font-size: 8px; text-transform: uppercase; }
+    .rank-actions { display: flex; gap: 5px; }
+
+    .evidence-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+    .evidence-card { display: flex; flex-direction: column; min-height: 290px; overflow: hidden; }
+    .ad-preview { padding: 16px; color: #fff; background: linear-gradient(145deg, #162238, #293b57); }
+    .ad-preview small { display: block; color: #bfdbfe; font-size: 9px; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
+    .ad-preview p { display: -webkit-box; overflow: hidden; margin: 9px 0 0; color: #dbe4f1; font-size: 11px; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+    .evidence-body { display: flex; flex: 1; flex-direction: column; padding: 16px; }
+    .evidence-body h3 { margin-bottom: 6px; font-size: 14px; line-height: 1.35; }
+    .domain { overflow: hidden; margin-bottom: 12px; color: var(--slate-500); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+    .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+    .chip { padding: 4px 7px; border-radius: 999px; color: var(--slate-600); background: var(--slate-100); font-size: 9px; font-weight: 700; }
+    .evidence-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--slate-100); }
+    .evidence-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .landing-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+    .landing-card { display: grid; grid-template-columns: 150px 1fr; min-height: 190px; overflow: hidden; }
+    .landing-shot { min-height: 190px; background: linear-gradient(145deg, #e2e8f0, #f8fafc); }
+    .landing-shot img { width: 100%; height: 100%; object-fit: cover; }
+    .landing-placeholder { display: grid; place-items: center; height: 100%; min-height: 190px; color: var(--slate-400); font-size: 28px; }
+    .landing-body { display: flex; min-width: 0; flex-direction: column; padding: 16px; }
+    .landing-body h3 { display: -webkit-box; overflow: hidden; margin-bottom: 7px; font-size: 14px; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+    .landing-body p { display: -webkit-box; overflow: hidden; margin-bottom: 11px; color: var(--slate-500); font-size: 11px; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+    .landing-body .evidence-footer { margin-top: auto; }
+    .methodology { padding: 16px 18px; }
+    .methodology summary { cursor: pointer; color: var(--slate-700); font-size: 12px; font-weight: 850; }
+    .methodology-list { display: grid; gap: 8px; margin: 14px 0 0; padding-left: 18px; color: var(--slate-600); font-size: 11px; line-height: 1.55; }
+
+    .empty, .error-state, .loading-state { grid-column: 1 / -1; padding: 30px; border: 1px dashed var(--slate-300); border-radius: 14px; color: var(--slate-500); background: #fff; text-align: center; font-size: 12px; }
+    .error-state { border-color: #fecaca; color: var(--red-700); background: #fff7f7; }
+    .empty i, .error-state i, .loading-state i { display: block; margin-bottom: 9px; font-size: 20px; }
+
+    dialog { width: min(620px, calc(100vw - 28px)); max-height: calc(100vh - 40px); border: 0; border-radius: 20px; padding: 0; box-shadow: 0 30px 90px rgba(2,6,23,.35); }
+    dialog::backdrop { background: rgba(2,6,23,.62); backdrop-filter: blur(2px); }
+    .dialog-head { display: flex; justify-content: space-between; gap: 15px; padding: 20px 22px; border-bottom: 1px solid var(--slate-200); }
+    .dialog-head h2 { margin-bottom: 3px; font-size: 18px; }
+    .dialog-head p { margin-bottom: 0; color: var(--slate-500); font-size: 11px; }
+    .icon-button { width: 36px; height: 36px; border: 0; border-radius: 10px; cursor: pointer; color: var(--slate-600); background: var(--slate-100); }
+    .dialog-body { max-height: 55vh; overflow: auto; padding: 18px 22px; }
+    .dialog-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-bottom: 14px; }
+    .summary-box { padding: 12px; border-radius: 12px; background: var(--slate-50); }
+    .summary-box b { display: block; font-size: 17px; }
+    .summary-box span { color: var(--slate-500); font-size: 9px; text-transform: uppercase; }
+    .plan-list { margin: 0; padding: 0; list-style: none; }
+    .plan-list li { display: grid; grid-template-columns: 24px 1fr; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--slate-100); font-size: 11px; }
+    .plan-list li:last-child { border-bottom: 0; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 9px; padding: 16px 22px; border-top: 1px solid var(--slate-200); background: var(--slate-50); }
+
+    @media (max-width: 1200px) {
+      .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .evidence-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .landing-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 920px) {
+      .mobile-header { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; height: 62px; padding: 0 16px; border-bottom: 1px solid var(--slate-200); background: rgba(255,255,255,.94); backdrop-filter: blur(12px); }
+      .mobile-brand { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 800; }
+      .mobile-brand .brand-mark { width: 34px; height: 34px; border-radius: 10px; font-size: 15px; }
+      .sidebar { transform: translateX(-102%); transition: transform .2s ease; }
+      body.menu-open .sidebar { transform: translateX(0); }
+      body.menu-open .overlay { display: block; }
+      .main { margin-left: 0; }
+      .content { padding: 24px 18px 60px; }
+      .overview-grid, .rank-grid { grid-template-columns: 1fr; }
+      .hero { flex-direction: column; }
+      .hero-meta { justify-content: flex-start; }
+    }
+    @media (max-width: 650px) {
+      .content { padding-inline: 13px; }
+      .filters, .kpi-grid, .evidence-grid { grid-template-columns: 1fr; }
+      .period-row, .section-heading, .card-header { align-items: flex-start; flex-direction: column; }
+      .plan-preview { grid-template-columns: 1fr; }
+      .plan-preview .button { width: 100%; }
+      .landing-card { grid-template-columns: 110px 1fr; }
+      .landing-shot, .landing-placeholder { min-height: 220px; }
+      .rank-row { grid-template-columns: 28px minmax(0, 1fr); }
+      .rank-metrics { grid-column: 2; justify-content: flex-start; flex-wrap: wrap; }
+      .dialog-summary { grid-template-columns: 1fr 1fr; }
+      .dialog-actions { flex-direction: column-reverse; }
+      .dialog-actions .button { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+
+  <header class="mobile-header">
+    <div class="mobile-brand"><span class="brand-mark">P</span>PFA Radar</div>
+    <button id="menu-open" class="icon-button" type="button" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+  </header>
+  <div id="menu-overlay" class="overlay" aria-hidden="true"></div>
+
+  <aside id="sidebar" class="sidebar" aria-label="Navegação principal">
+    <div class="brand">
+      <div class="brand-mark">P</div>
+      <div><strong>PFA Advogados</strong><small>Inteligência competitiva</small></div>
+    </div>
+    <div class="nav-label">Radar</div>
+    <nav class="nav-list">
+      <a class="nav-link active" href="#visao-geral"><i class="fa-solid fa-gauge-high"></i>Visão de mercado</a>
+      <a class="nav-link" href="#concorrentes"><i class="fa-solid fa-building"></i>Concorrentes</a>
+      <a class="nav-link" href="#consultas"><i class="fa-solid fa-magnifying-glass-chart"></i>Consultas observadas</a>
+      <a class="nav-link" href="#evidencias"><i class="fa-solid fa-rectangle-ad"></i>Evidências</a>
+      <a class="nav-link" href="#landing-pages"><i class="fa-regular fa-window-maximize"></i>Landing pages</a>
+    </nav>
+    <div class="nav-label">Sistema PFA</div>
+    <nav class="nav-list">
+      <a class="nav-link" href="#"><i class="fa-solid fa-chart-pie"></i>Visão geral</a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-users"></i>CRM</a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-scale-balanced"></i>Jurídico</a>
+    </nav>
+    <div class="sidebar-note">
+      <strong>Leitura baseada em evidências</strong>
+      <span>Os números representam somente anúncios e páginas observados pelo radar.</span>
+    </div>
+  </aside>
+
+  <main id="conteudo" class="main">
+    <div class="content">
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">PFA Intelligence</p>
+          <h1 id="page-title">Radar de Inteligência Google Ads</h1>
+          <p class="hero-copy">Descubra padrões de presença, mensagens e landing pages a partir de evidências públicas observadas — sem confundir amostra com o universo total do mercado.</p>
+        </div>
+        <div class="hero-meta">
+          <span id="freshness-badge" class="pill"><i class="fa-regular fa-clock"></i><span>Atualização não carregada</span></span>
+          <span id="quota-badge" class="pill"><i class="fa-solid fa-circle-notch fa-spin"></i><span>Consultando saldo…</span></span>
+        </div>
+      </section>
+
+      <section class="card planner" aria-labelledby="planner-title">
+        <div class="card-header">
+          <div>
+            <h2 id="planner-title">Planejar nova varredura</h2>
+            <p>Nenhuma busca acontece sozinha. Revise o custo e confirme antes de consumir consultas.</p>
+          </div>
+          <span class="tag collected"><i class="fa-solid fa-shield-halved"></i> sob demanda</span>
+        </div>
+        <div class="planner-body">
+          <div class="period-row">
+            <div>
+              <span class="field-label">Período analisado no painel</span>
+              <div class="segmented" role="group" aria-label="Período analisado">
+                <button class="segment" type="button" data-period="7" aria-pressed="false">7 dias</button>
+                <button class="segment active" type="button" data-period="30" aria-pressed="true">30 dias</button>
+                <button class="segment" type="button" data-period="90" aria-pressed="false">90 dias</button>
+              </div>
+            </div>
+            <div class="source-line"><i class="fa-solid fa-filter"></i><span>Os filtros atualizam os indicadores, rankings e evidências.</span></div>
+          </div>
+
+          <div class="filters">
+            <label>
+              <span class="field-label">Serviço</span>
+              <select id="service-filter" class="control">
+                <option value="Direito de Trânsito">Direito de Trânsito (amplo)</option>
+                <option value="Lei Seca" selected>Lei Seca</option>
+                <option value="Suspensão">Suspensão da CNH</option>
+                <option value="Cassação">Cassação da CNH</option>
+                <option value="PPD">Permissão para Dirigir (PPD)</option>
+              </select>
+            </label>
+
+            <div>
+              <span class="field-label">Regiões monitoradas</span>
+              <details id="region-select" class="region-select">
+                <summary><span id="region-label">São Bernardo do Campo</span><i class="fa-solid fa-chevron-down"></i></summary>
+                <div class="region-menu">
+                  <label class="check-row"><input type="checkbox" name="region" value="São Bernardo do Campo" checked>São Bernardo do Campo</label>
+                  <label class="check-row"><input type="checkbox" name="region" value="Santo André">Santo André</label>
+                  <label class="check-row"><input type="checkbox" name="region" value="São Caetano do Sul">São Caetano do Sul</label>
+                  <label class="check-row"><input type="checkbox" name="region" value="Diadema">Diadema</label>
+                  <label class="check-row"><input type="checkbox" name="region" value="Mauá">Mauá</label>
+                  <label class="check-row"><input type="checkbox" name="region" value="São Paulo">São Paulo</label>
+                  <label class="check-row"><input type="checkbox" name="region" value="Campinas">Campinas</label>
+                  <label class="check-row"><input type="checkbox" name="region" value="Santos">Santos</label>
+                  <label class="check-row"><input type="checkbox" name="region" value="Guarulhos">Guarulhos</label>
+                  <label class="check-row"><input type="checkbox" name="region" value="Osasco">Osasco</label>
+                  <div class="region-add">
+                    <input id="custom-region" type="text" maxlength="100" placeholder="Outra cidade ou região" aria-label="Adicionar outra localização">
+                    <button id="add-region" type="button">Adicionar</button>
+                  </div>
+                </div>
+              </details>
+            </div>
+
+            <label>
+              <span class="field-label">Dispositivo</span>
+              <select id="device-filter" class="control">
+                <option value="mobile">Mobile</option>
+                <option value="desktop">Desktop</option>
+                <option value="both">Mobile + Desktop</option>
+              </select>
+            </label>
+
+            <fieldset style="border:0;padding:0;margin:0">
+              <legend class="field-label">Profundidade</legend>
+              <div class="mode-options">
+                <label class="mode-option"><input type="radio" name="scan-mode" value="economico" checked><span><b>Econômico</b><small>termos prioritários</small></span></label>
+                <label class="mode-option"><input type="radio" name="scan-mode" value="completo"><span><b>Completo</b><small>todas as variações</small></span></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div id="plan-preview" class="plan-preview" aria-live="polite">
+            <div class="plan-main">
+              <span class="plan-icon"><i class="fa-solid fa-calculator"></i></span>
+              <div><strong id="plan-title">Calculando o custo da varredura…</strong><p id="plan-description">A consulta ao plano não executa pesquisas.</p></div>
+            </div>
+            <button id="review-scan" class="button primary" type="button" disabled><i class="fa-solid fa-list-check"></i>Revisar e executar</button>
+          </div>
+
+          <div id="progress-panel" class="progress-panel" hidden aria-live="polite">
+            <div class="progress-head"><span id="progress-title">Executando plano</span><span id="progress-count">0 / 0</span></div>
+            <div class="progress-track" role="progressbar" aria-label="Progresso da varredura" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progress-bar" class="progress-bar"></div></div>
+            <p id="progress-detail" class="progress-detail">Preparando a primeira consulta…</p>
+            <button id="cancel-scan" class="button danger" type="button" style="margin-top:10px">Parar após esta busca</button>
+          </div>
+        </div>
+      </section>
+
+      <div id="global-status" class="status info" role="status" aria-live="polite" hidden></div>
+
+      <div id="dashboard-content" aria-busy="true">
+        <section id="visao-geral" class="section" aria-labelledby="overview-title">
+          <div class="section-heading">
+            <div><h2 id="overview-title">Visão do mercado observado</h2><p>O que mudou e onde vale aprofundar a análise.</p></div>
+            <div id="dashboard-source" class="source-line"><i class="fa-solid fa-database"></i><span>Carregando fonte…</span></div>
+          </div>
+          <div id="coverage-strip" class="coverage-strip" aria-live="polite"><span class="tag collected">Dado coletado</span><span>Carregando cobertura da amostra…</span></div>
+          <div id="kpi-grid" class="kpi-grid" aria-live="polite"></div>
+        </section>
+
+        <section class="section overview-grid">
+          <article class="card panel">
+            <div class="panel-title"><h3>Resumo executivo observado</h3><span class="tag derived">Dado derivado</span></div>
+            <div id="insights-list" class="insight-list"></div>
+          </article>
+          <article class="card panel">
+            <div class="panel-title"><h3>Tendência de aparições observadas</h3><span class="tag collected">Dado coletado</span></div>
+            <div id="trend-chart" class="trend-chart" aria-label="Gráfico de aparições observadas por período"></div>
+            <div id="trend-source" class="source-line" style="margin-top:12px"></div>
+          </article>
+        </section>
+
+        <section id="concorrentes" class="section rank-grid">
+          <article class="card panel">
+            <div class="panel-title"><h3>Ranking de concorrentes observados</h3><span class="tag derived">Dado derivado</span></div>
+            <ol id="competitor-ranking" class="ranking"></ol>
+          </article>
+          <article id="consultas" class="card panel">
+            <div class="panel-title"><h3>Consultas com maior presença</h3><span class="tag derived">Dado derivado</span></div>
+            <ol id="query-ranking" class="ranking"></ol>
+          </article>
+        </section>
+
+        <section id="evidencias" class="section">
+          <div class="section-heading">
+            <div><h2>Evidências recentes</h2><p>Anúncios observados nas varreduras — esta amostra não representa o inventário completo do anunciante.</p></div>
+            <span class="tag collected">Dado coletado</span>
+          </div>
+          <div id="evidence-grid" class="evidence-grid"></div>
+        </section>
+
+        <section id="landing-pages" class="section">
+          <div class="section-heading">
+            <div><h2>Landing pages observadas</h2><p>Capturas passivas, mensagens e sinais encontrados nas páginas de destino.</p></div>
+            <span class="tag collected">Dado coletado</span>
+          </div>
+          <div id="landing-grid" class="landing-grid"></div>
+        </section>
+
+        <details class="card methodology section">
+          <summary>Metodologia e limites desta leitura</summary>
+          <ul id="methodology-list" class="methodology-list"></ul>
+        </details>
+      </div>
+    </div>
+  </main>
+
+  <dialog id="confirm-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-head">
+      <div><h2 id="dialog-title">Confirmar varredura</h2><p>Confira o consumo estimado antes de iniciar. As pesquisas serão executadas uma por vez.</p></div>
+      <button id="dialog-close" class="icon-button" type="button" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="dialog-body">
+      <div id="dialog-summary" class="dialog-summary"></div>
+      <div id="dialog-warning" class="status info" hidden></div>
+      <ol id="dialog-plan" class="plan-list"></ol>
+    </div>
+    <div class="dialog-actions">
+      <button id="dialog-cancel" class="button secondary" type="button">Voltar</button>
+      <button id="confirm-scan" class="button primary" type="button"><i class="fa-solid fa-play"></i>Confirmar e executar</button>
+    </div>
+  </dialog>
+
+  <script>
+    "use strict";
+
+    const API_BASE_URL = window.location.protocol === "file:"
+      ? "https://chatwoot-radar-api.phqoes.easypanel.host"
+      : window.location.origin;
+
+    const SERVICE_VARIANTS = {
+      "Direito de Trânsito": ["advogado de trânsito", "recurso de multa", "recorrer multa de trânsito", "defesa CNH", "advogado especialista em trânsito", "recurso CNH", "multa de trânsito advogado", "defesa direito de dirigir"],
+      "Lei Seca": ["recusa bafômetro", "recurso multa bafômetro", "recorrer multa de bafômetro", "defesa lei seca", "advogado bafômetro", "advogado lei seca", "multa por embriaguez ao volante", "suspensão CNH lei seca"],
+      "Suspensão": ["recurso suspensão CNH", "advogado suspensão CNH", "CNH suspensa", "defesa suspensão carteira", "processo suspensão CNH", "recorrer suspensão direito de dirigir", "multa com suspensão CNH", "como recuperar CNH suspensa"],
+      "Cassação": ["recurso cassação CNH", "advogado cassação CNH", "CNH cassada", "defesa cassação carteira", "processo cassação CNH", "recorrer cassação direito de dirigir", "dirigir com CNH suspensa cassação", "como recuperar CNH cassada"],
+      "PPD": ["recurso perda PPD", "advogado PPD", "permissão para dirigir multa", "defesa PPD", "multa grave na PPD", "perdi a permissão para dirigir", "recorrer multa carteira provisória", "cassação carteira provisória"],
+    };
+
+    const state = {
+      filters: { period: 30, service: "Lei Seca", regions: ["São Bernardo do Campo"], device: "mobile", mode: "economico" },
+      quota: null,
+      plan: null,
+      dashboard: null,
+      planSequence: 0,
+      dashboardSequence: 0,
+      scanning: false,
+      cancelRequested: false,
+      dashboardTimer: null,
+      planTimer: null,
+    };
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;",
+      })[character]);
+    }
+
+    function safeUrl(value, allowRelative = false) {
+      if (!value) return null;
+      try {
+        const url = new URL(String(value), allowRelative ? API_BASE_URL : undefined);
+        return ["http:", "https:"].includes(url.protocol) ? url.href : null;
+      } catch (_) { return null; }
+    }
+
+    function safeLandingUrl(value) {
+      const result = safeUrl(value, false);
+      if (!result) return null;
+      const url = new URL(result);
+      const host = url.hostname.toLowerCase();
+      const googleTracker = (host.includes("google.") && url.pathname.includes("/aclk")) || host.includes("googleadservices.");
+      return googleTracker ? null : result;
+    }
+
+    function formatNumber(value) {
+      if (value === null || value === undefined || value === "") return "—";
+      const number = Number(value);
+      return Number.isFinite(number) ? new Intl.NumberFormat("pt-BR").format(number) : "—";
+    }
+
+    function formatDate(value, includeTime = false) {
+      if (!value) return "data não informada";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "data não informada";
+      return new Intl.DateTimeFormat("pt-BR", includeTime
+        ? { dateStyle: "short", timeStyle: "short" }
+        : { dateStyle: "short" }).format(date);
+    }
+
+    function firstNumber(...values) {
+      for (const value of values) {
+        if (value === null || value === undefined || value === "") continue;
+        const number = Number(value);
+        if (Number.isFinite(number)) return number;
+      }
+      return 0;
+    }
+
+    function firstNullableNumber(...values) {
+      for (const value of values) {
+        if (value === null || value === undefined || value === "") continue;
+        const number = Number(value);
+        if (Number.isFinite(number)) return number;
+      }
+      return null;
+    }
+
+    function firstArray(...values) {
+      return values.find(Array.isArray) || [];
+    }
+
+    function firstObject(...values) {
+      return values.find((value) => value && typeof value === "object" && !Array.isArray(value)) || {};
+    }
+
+    async function fetchJson(path, options = {}, timeoutMs = 30000) {
+      const controller = new AbortController();
+      const timer = timeoutMs ? setTimeout(() => controller.abort(), timeoutMs) : null;
+      try {
+        const response = await fetch(API_BASE_URL + path, { ...options, signal: controller.signal });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok) {
+          const detail = payload?.detail || payload?.message || `Erro HTTP ${response.status}`;
+          const error = new Error(detail);
+          error.status = response.status;
+          throw error;
+        }
+        return payload || {};
+      } catch (error) {
+        if (error.name === "AbortError") throw new Error("A API demorou além do esperado para responder.");
+        throw error;
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    }
+
+    function showStatus(message, type = "info") {
+      const box = $("#global-status");
+      box.className = `status ${type}`;
+      box.innerHTML = `<i class="fa-solid ${type === "error" ? "fa-circle-exclamation" : type === "success" ? "fa-circle-check" : "fa-circle-info"}"></i><span>${escapeHtml(message)}</span>`;
+      box.hidden = false;
+    }
+
+    function selectedRegions() {
+      return $$("input[name='region']:checked").map((input) => input.value);
+    }
+
+    function syncFilters() {
+      state.filters.service = $("#service-filter").value;
+      state.filters.regions = selectedRegions();
+      state.filters.device = $("#device-filter").value;
+      state.filters.mode = $("input[name='scan-mode']:checked").value;
+      const count = state.filters.regions.length;
+      $("#region-label").textContent = count === 0
+        ? "Selecione ao menos uma região"
+        : count === 1 ? state.filters.regions[0] : `${count} regiões selecionadas`;
+    }
+
+    function planQueryString(filters = state.filters) {
+      const devices = filters.device === "both" ? "mobile,desktop" : filters.device;
+      const params = new URLSearchParams({
+        service: filters.service,
+        locations: filters.regions.join(","),
+        devices,
+        mode: filters.mode,
+      });
+      return params.toString();
+    }
+
+    function dashboardQueryString(filters = state.filters) {
+      const params = new URLSearchParams({
+        days: String(filters.period),
+        service: filters.service,
+      });
+      if (filters.regions.length) params.set("location", filters.regions.join(","));
+      if (filters.device !== "both") params.set("device", filters.device);
+      return params.toString();
+    }
+
+    function localPlan() {
+      const allVariants = SERVICE_VARIANTS[state.filters.service] || [state.filters.service];
+      const variants = state.filters.mode === "economico" ? allVariants.slice(0, 3) : allVariants;
+      const devices = state.filters.device === "both" ? ["mobile", "desktop"] : [state.filters.device];
+      const baseCombinations = state.filters.regions.length * devices.length;
+      const maxTerms = baseCombinations ? Math.floor(24 / baseCombinations) : 0;
+      const selectedVariants = variants.slice(0, maxTerms);
+      const omittedKeywords = variants.slice(maxTerms);
+      const searches = [];
+      selectedVariants.forEach((keyword) => state.filters.regions.forEach((location) => devices.forEach((device) => searches.push({ keyword, location, device }))));
+      const remaining = state.quota?.remaining ?? null;
+      return {
+        searches,
+        estimatedSearches: searches.length,
+        remaining: state.quota?.remaining ?? null,
+        sufficient: remaining !== null && searches.length > 0 && searches.length <= remaining,
+        omittedKeywords,
+        limited: omittedKeywords.length > 0,
+        source: omittedKeywords.length
+          ? "Estimativa local equilibrada e limitada a 24 consultas"
+          : "Estimativa local de contingência",
+        fallback: true,
+      };
+    }
+
+    function normalizePlan(raw) {
+      const container = firstObject(raw.plan, raw.search_plan, raw);
+      const rawSearches = firstArray(container.matrix, container.searches, container.items, container.queries, raw.matrix, raw.searches, raw.items);
+      const searches = rawSearches.map((item) => ({
+        keyword: item.keyword || item.query || item.term || item.q,
+        location: item.location || item.region || item.city,
+        device: String(item.device || state.filters.device).toLowerCase(),
+      })).filter((item) => item.keyword && item.location && ["mobile", "desktop"].includes(item.device));
+      const fallback = localPlan();
+      const finalSearches = searches.length ? searches : fallback.searches;
+      const estimatedSearches = firstNumber(container.estimated_credits, container.estimated_searches, container.search_count, container.total_searches, container.cost, raw.estimated_credits, raw.estimated_searches, finalSearches.length);
+      const remainingRaw = container.quota_remaining ?? container.remaining ?? raw.quota_remaining ?? state.quota?.remaining;
+      const remaining = remainingRaw == null ? null : firstNumber(remainingRaw);
+      const omittedKeywords = firstArray(container.omitted_keywords, raw.omitted_keywords).map(String);
+      return {
+        searches: finalSearches,
+        estimatedSearches: estimatedSearches || finalSearches.length,
+        remaining,
+        sufficient: remaining !== null
+          && (container.sufficient_quota ?? container.can_execute ?? ((estimatedSearches || finalSearches.length) <= remaining)),
+        omittedKeywords,
+        limited: Boolean(container.limited ?? raw.limited ?? omittedKeywords.length),
+        source: container.methodology || raw.methodology || container.source || raw.source || "API Radar / search-plan",
+        fallback: searches.length === 0,
+      };
+    }
+
+    function renderPlan() {
+      const plan = state.plan;
+      const button = $("#review-scan");
+      if (!plan) {
+        $("#plan-title").textContent = "Não foi possível estimar o plano";
+        $("#plan-description").textContent = "Revise os filtros e tente novamente.";
+        button.disabled = true;
+        return;
+      }
+      if (!state.filters.regions.length) {
+        $("#plan-title").textContent = "Selecione pelo menos uma região";
+        $("#plan-description").textContent = "Nenhuma consulta será executada sem região definida.";
+        button.disabled = true;
+        return;
+      }
+      if (!plan.searches.length) {
+        $("#plan-title").textContent = "Seleção acima do teto de 24 consultas";
+        $("#plan-description").textContent = "Reduza a quantidade de regiões ou escolha apenas um dispositivo.";
+        button.disabled = true;
+        return;
+      }
+      const quotaText = plan.remaining == null ? "saldo não informado" : `${formatNumber(plan.remaining)} disponíveis`;
+      $("#plan-title").textContent = `Custo estimado: ${formatNumber(plan.estimatedSearches)} consultas SerpApi`;
+      const limitText = plan.limited
+        ? ` · limite de 24: ${plan.omittedKeywords.length} termo(s) omitido(s)`
+        : "";
+      $("#plan-description").textContent = `${plan.searches.length} combinações sequenciais · ${quotaText}${limitText} · ${plan.source}${plan.fallback ? " (contingência)" : ""}`;
+      button.disabled = state.scanning || !plan.sufficient;
+      if (!plan.sufficient) {
+        $("#plan-title").textContent = plan.remaining == null
+          ? "Saldo indisponível: execução bloqueada por segurança"
+          : "Saldo insuficiente para este plano";
+      }
+    }
+
+    async function loadQuota() {
+      const badge = $("#quota-badge");
+      try {
+        const raw = await fetchJson("/api/radar/quota", {}, 15000);
+        const source = firstObject(raw.quota, raw.account, raw);
+        const remaining = firstNullableNumber(source.remaining, source.searches_left, source.total_searches_left, raw.remaining);
+        const limit = firstNullableNumber(source.limit, source.monthly_limit, source.searches_per_month, raw.limit);
+        const used = firstNullableNumber(source.used, source.this_month_usage, raw.used, limit != null && remaining != null ? limit - remaining : null);
+        if (raw.status === "unavailable" || remaining === null) throw new Error(raw.error || "Saldo indisponível");
+        state.quota = { remaining, limit, used, resetAt: source.reset_at || source.resets_at || raw.reset_at };
+        badge.className = `pill ${remaining > 0 ? "success" : "warning"}`;
+        badge.innerHTML = `<i class="fa-solid fa-coins"></i><span>Saldo SerpApi: ${formatNumber(remaining)}${limit ? ` / ${formatNumber(limit)}` : ""}</span>`;
+      } catch (_) {
+        state.quota = null;
+        badge.className = "pill warning";
+        badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>Saldo indisponível</span>';
+      }
+    }
+
+    async function loadPlan() {
+      const sequence = ++state.planSequence;
+      $("#plan-title").textContent = "Calculando o custo da varredura…";
+      $("#plan-description").textContent = "A consulta ao plano não executa pesquisas.";
+      $("#review-scan").disabled = true;
+      if (!state.filters.regions.length) {
+        state.plan = localPlan();
+        renderPlan();
+        return;
+      }
+      try {
+        const raw = await fetchJson(`/api/radar/search-plan?${planQueryString()}`, {}, 15000);
+        if (sequence !== state.planSequence) return;
+        state.plan = normalizePlan(raw);
+      } catch (_) {
+        if (sequence !== state.planSequence) return;
+        state.plan = localPlan();
+      }
+      renderPlan();
+    }
+
+    function normalizeObservation(item) {
+      const snapshot = firstObject(item.latest_snapshot, item.snapshot);
+      return {
+        id: item.id,
+        searchRunId: item.search_run_id,
+        advertiser: item.advertiser || item.advertiser_name || item.domain || "Anunciante não identificado",
+        domain: item.domain || item.advertiser_domain || "",
+        title: item.title || item.headline || "Anúncio sem título",
+        description: item.description || item.copy || "Descrição não disponível.",
+        keyword: item.keyword || item.query || item.service || "",
+        location: item.location || item.region || "",
+        device: item.device || "",
+        targetUrl: item.landing_page_url || item.target_url || item.link || "",
+        observedAt: item.observed_at || item.collected_at || item.created_at,
+        screenshotUrl: snapshot.screenshot_url || item.screenshot_url || item.screenshot_path || "",
+        snapshotStatus: snapshot.status || item.capture_status || "",
+        h1: snapshot.h1 || item.h1 || item.landing_h1 || "",
+        h2: firstArray(snapshot.h2, item.h2, item.h2_list, item.subtitles),
+        primaryCta: snapshot.primary_cta || item.primary_cta || "",
+        whatsappLinks: firstArray(snapshot.whatsapp_links, item.whatsapp_links, item.whatsapp),
+        formFields: firstArray(snapshot.form_fields, item.form_fields),
+        faqEntries: firstArray(snapshot.faq_entries, item.faq_entries),
+        socialProof: firstArray(snapshot.social_proof, item.social_proof),
+        urgencySignals: firstArray(snapshot.urgency_signals, item.urgency_signals),
+        authoritySignals: firstArray(snapshot.authority_signals, item.authority_signals),
+        capturedAt: snapshot.captured_at || item.captured_at,
+      };
+    }
+
+    function filterObservations(items) {
+      const cutoff = Date.now() - state.filters.period * 86400000;
+      const variants = new Set((SERVICE_VARIANTS[state.filters.service] || [state.filters.service]).map((value) => value.toLocaleLowerCase("pt-BR")));
+      const devices = state.filters.device === "both" ? ["mobile", "desktop"] : [state.filters.device];
+      return items.filter((item) => {
+        const date = item.observedAt ? new Date(item.observedAt).getTime() : Date.now();
+        const keyword = String(item.keyword || "").toLocaleLowerCase("pt-BR");
+        const serviceMatch = !keyword || variants.has(keyword) || keyword.includes(state.filters.service.toLocaleLowerCase("pt-BR"));
+        const regionMatch = !item.location || state.filters.regions.includes(item.location);
+        const deviceMatch = !item.device || devices.includes(String(item.device).toLowerCase());
+        return date >= cutoff && serviceMatch && regionMatch && deviceMatch;
+      });
+    }
+
+    function deriveDashboard(observations) {
+      const filtered = filterObservations(observations.map(normalizeObservation));
+      const competitors = new Map();
+      const queries = new Map();
+      const days = new Map();
+      const uniqueAds = new Set();
+      const landings = new Map();
+
+      filtered.forEach((item) => {
+        const domain = item.domain || item.advertiser;
+        const adKey = `${domain}|${item.title}|${item.description}`.toLocaleLowerCase("pt-BR");
+        uniqueAds.add(adKey);
+        const competitor = competitors.get(domain) || { name: item.advertiser, domain, uniqueAds: new Set(), appearances: 0, queries: new Set(), regions: new Set(), lastSeen: null };
+        competitor.uniqueAds.add(adKey);
+        competitor.appearances += 1;
+        if (item.keyword) competitor.queries.add(item.keyword);
+        if (item.location) competitor.regions.add(item.location);
+        if (!competitor.lastSeen || new Date(item.observedAt) > new Date(competitor.lastSeen)) competitor.lastSeen = item.observedAt;
+        competitors.set(domain, competitor);
+        if (item.keyword) {
+          const query = queries.get(item.keyword) || { query: item.keyword, appearances: 0, competitors: new Set() };
+          query.appearances += 1;
+          query.competitors.add(domain);
+          queries.set(item.keyword, query);
+        }
+        const dateKey = item.observedAt ? new Date(item.observedAt).toISOString().slice(0, 10) : "sem data";
+        days.set(dateKey, (days.get(dateKey) || 0) + 1);
+        if (item.targetUrl) landings.set(item.targetUrl, item);
+      });
+
+      const competitorList = [...competitors.values()].map((item) => ({ ...item, uniqueAds: item.uniqueAds.size, queries: item.queries.size, regions: item.regions.size })).sort((a, b) => b.uniqueAds - a.uniqueAds || b.appearances - a.appearances);
+      const queryList = [...queries.values()].map((item) => ({ ...item, competitors: item.competitors.size })).sort((a, b) => b.appearances - a.appearances);
+      const trend = [...days.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, value]) => ({ date, value }));
+      const insights = [];
+      if (competitorList[0]) insights.push({ text: `${competitorList[0].name} lidera a amostra com ${competitorList[0].uniqueAds} anúncios únicos observados.`, confidence: "Alta", kind: "derived" });
+      if (queryList[0]) insights.push({ text: `“${queryList[0].query}” concentrou ${queryList[0].appearances} aparições observadas no período.`, confidence: "Alta", kind: "derived" });
+      if (landings.size) insights.push({ text: `${landings.size} landing pages distintas foram associadas às evidências filtradas.`, confidence: "Média", kind: "derived" });
+
+      return {
+        kpis: {
+          competitorsObserved: competitorList.length,
+          uniqueAdsObserved: uniqueAds.size,
+          appearances: filtered.length,
+          queriesObserved: queryList.length,
+          landingPages: landings.size,
+        },
+        insights,
+        competitors: competitorList,
+        queries: queryList,
+        trend,
+        observations: filtered.sort((a, b) => new Date(b.observedAt || 0) - new Date(a.observedAt || 0)),
+        landingPages: [...landings.values()],
+        meta: {
+          source: "Banco Radar · /api/radar/observations",
+          generatedAt: new Date().toISOString(),
+          dataUntil: filtered[0]?.observedAt || null,
+          confidence: "Média",
+          fallback: true,
+          methodology: {},
+        },
+      };
+    }
+
+    function normalizeDashboard(raw) {
+      const metrics = firstObject(raw.coverage, raw.kpis, raw.metrics, raw.summary?.kpis, raw.summary, raw);
+      const competitorsRaw = firstArray(raw.advertiser_ranking, raw.competitors, raw.advertisers, raw.competitor_ranking, raw.rankings?.competitors);
+      const queriesRaw = firstArray(raw.query_ranking, raw.queries, raw.keywords, raw.rankings?.queries);
+      const observations = firstArray(raw.recent_observations, raw.observations, raw.evidence, raw.ads).map(normalizeObservation);
+      const landingsRaw = firstArray(raw.landing_pages, raw.landings, raw.recent_landings);
+      const landingPages = landingsRaw.length
+        ? landingsRaw.map((item) => ({ ...normalizeObservation(item), ...item }))
+        : [...new Map(observations.filter((item) => item.targetUrl).map((item) => [item.targetUrl, item])).values()];
+      return {
+        kpis: {
+          competitorsObserved: firstNumber(metrics.advertisers_observed, metrics.competitors_observed, metrics.competitors, metrics.advertisers_count),
+          uniqueAdsObserved: firstNumber(metrics.unique_ads_observed, metrics.unique_ads, metrics.ads_unique),
+          appearances: firstNumber(metrics.appearances, metrics.observations, metrics.total_observations),
+          queriesObserved: firstNumber(metrics.completed_queries_searched, metrics.queries_searched, metrics.queries_observed, metrics.queries, metrics.search_terms),
+          landingPages: firstNumber(metrics.landing_pages_observed, metrics.landing_pages, metrics.landings),
+        },
+        insights: firstArray(raw.executive_summary, raw.insights, raw.readout, raw.summary?.insights).map((item) => typeof item === "string"
+          ? { text: item, confidence: "Média", kind: "derived" }
+          : { text: item.text || item.message || item.insight, confidence: item.confidence || item.confidence_level || (item.kind === "observed" ? "Alta" : "Média"), kind: item.kind || "derived" }).filter((item) => item.text),
+        competitors: competitorsRaw.map((item) => ({
+          name: item.name || item.advertiser || item.display_name || item.domain,
+          domain: item.domain || item.advertiser_domain || "",
+          uniqueAds: firstNumber(item.unique_ads_observed, item.unique_ads, item.ads_count),
+          appearances: firstNumber(item.appearances, item.observations, item.total_observations),
+          queries: firstNumber(item.search_runs_with_presence, item.queries_observed, item.queries, item.search_terms),
+          regions: firstNumber(item.regions_observed, item.regions, item.cities),
+          presenceRate: firstNumber(item.observed_presence_rate),
+          landingPages: firstNumber(item.landing_pages_observed),
+          firstSeen: item.first_observed_at || item.first_seen,
+          lastSeen: item.last_seen || item.last_observed_at || item.observed_at,
+          transparencyUrl: item.transparency_url,
+        })),
+        queries: queriesRaw.map((item) => ({
+          query: item.query || item.keyword || item.term,
+          appearances: firstNumber(item.appearances, item.observations, item.count),
+          competitors: firstNumber(item.advertisers_observed, item.competitors, item.advertisers, item.domains),
+          uniqueAds: firstNumber(item.unique_ads_observed, item.unique_ads),
+          searches: firstNumber(item.completed_runs, item.search_runs),
+          failures: firstNumber(item.failed_runs),
+        })),
+        trend: firstArray(raw.trend, raw.timeline, raw.series, raw.appearances_over_time).map((item) => ({ date: item.date || item.day || item.period || item.label, value: firstNumber(item.value, item.appearances, item.observations, item.count) })),
+        observations,
+        landingPages,
+        meta: {
+          source: raw.meta?.source || raw.source || "Banco PostgreSQL · Radar PFA",
+          generatedAt: raw.meta?.generated_at || raw.generated_at || raw.updated_at || new Date().toISOString(),
+          dataUntil: metrics.last_observation_at || metrics.last_search_at || raw.meta?.data_until || null,
+          confidence: raw.meta?.confidence || raw.confidence || "Alta",
+          fallback: false,
+          methodology: firstObject(raw.methodology),
+          coverage: {
+            completed: firstNumber(metrics.completed_search_runs),
+            failed: firstNumber(metrics.failed_search_runs),
+            queries: firstNumber(metrics.queries_searched),
+            locations: firstNumber(metrics.locations_searched),
+            devices: firstNumber(metrics.devices_searched),
+          },
+        },
+      };
+    }
+
+    function kpiCard(icon, value, label, type, meta) {
+      return `<article class="kpi"><div class="kpi-top"><span class="kpi-icon"><i class="fa-solid ${icon}"></i></span><span class="tag ${type === "coletado" ? "collected" : "derived"}">${type === "coletado" ? "Dado coletado" : "Dado derivado"}</span></div><div class="kpi-value">${formatNumber(value)}</div><p class="kpi-label">${escapeHtml(label)}</p><div class="source-line"><span>Dados até ${escapeHtml(formatDate(meta.dataUntil || meta.generatedAt))}</span><span>·</span><span class="confidence">Confiança ${escapeHtml(meta.confidence)}</span></div></article>`;
+    }
+
+    function renderKpis(data) {
+      const kpis = data.kpis;
+      $("#kpi-grid").innerHTML = [
+        kpiCard("fa-building", kpis.competitorsObserved, "Concorrentes observados", "derivado", data.meta),
+        kpiCard("fa-rectangle-ad", kpis.uniqueAdsObserved, "Anúncios únicos observados", "derivado", data.meta),
+        kpiCard("fa-eye", kpis.appearances, "Aparições observadas", "coletado", data.meta),
+        kpiCard("fa-magnifying-glass", kpis.queriesObserved, "Consultas executadas", "derivado", data.meta),
+        kpiCard("fa-window-maximize", kpis.landingPages, "Landing pages observadas", "derivado", data.meta),
+      ].join("");
+    }
+
+    function renderInsights(data) {
+      const container = $("#insights-list");
+      if (!data.insights.length) {
+        container.innerHTML = '<div class="empty"><i class="fa-regular fa-lightbulb"></i>Ainda não há evidência suficiente para uma leitura derivada neste recorte.</div>';
+        return;
+      }
+      container.innerHTML = data.insights.slice(0, 4).map((item, index) => {
+        const collected = item.kind === "observed";
+        return `<div class="insight"><span class="insight-number">${index + 1}</span><div><p>${escapeHtml(item.text)}</p><div class="source-line"><span class="tag ${collected ? "collected" : "derived"}">${collected ? "Dado coletado" : "Dado derivado"}</span><span>${escapeHtml(data.meta.source)}</span><span>·</span><span>${escapeHtml(formatDate(data.meta.generatedAt))}</span><span>·</span><span class="confidence">Confiança ${escapeHtml(item.confidence || data.meta.confidence)}</span></div></div></div>`;
+      }).join("");
+    }
+
+    function renderTrend(data) {
+      const chart = $("#trend-chart");
+      if (!data.trend.length) {
+        chart.innerHTML = '<div class="empty" style="width:100%"><i class="fa-solid fa-chart-column"></i>Sem série temporal suficiente para o período selecionado.</div>';
+      } else {
+        const maxColumns = Math.max(
+          6,
+          Math.min(30, Math.floor((chart.clientWidth || 300) / 25)),
+        );
+        const bucketSize = Math.max(1, Math.ceil(data.trend.length / maxColumns));
+        const values = [];
+        for (let index = 0; index < data.trend.length; index += bucketSize) {
+          const bucket = data.trend.slice(index, index + bucketSize);
+          values.push({
+            date: bucket[0].date,
+            endDate: bucket[bucket.length - 1].date,
+            value: bucket.reduce((total, item) => total + (Number(item.value) || 0), 0),
+          });
+        }
+        const max = Math.max(...values.map((item) => Number(item.value) || 0), 1);
+        chart.innerHTML = values.map((item, index) => {
+          const value = Number(item.value) || 0;
+          const height = Math.max(3, Math.round((value / max) * 145));
+          const periodLabel = item.endDate && item.endDate !== item.date ? `${formatDate(item.date)} a ${formatDate(item.endDate)}` : formatDate(item.date);
+          const showLabel = values.length <= 14 || index === 0 || index === values.length - 1 || index % 5 === 0;
+          return `<div class="trend-column" title="${escapeHtml(periodLabel)}: ${formatNumber(value)} aparições observadas"><span class="trend-value">${formatNumber(value)}</span><span class="trend-bar" style="height:${height}px"></span><span class="trend-label">${showLabel ? escapeHtml(formatDate(item.date).slice(0, 5)) : ""}</span></div>`;
+        }).join("");
+      }
+      $("#trend-source").innerHTML = `<span>${escapeHtml(data.meta.source)}</span><span>·</span><span>Dados até ${escapeHtml(formatDate(data.meta.dataUntil || data.meta.generatedAt))}</span><span>·</span><span class="confidence">Confiança ${escapeHtml(data.meta.confidence)}</span>`;
+    }
+
+    function transparencyUrl(item) {
+      const explicit = safeUrl(item.transparencyUrl);
+      if (explicit) return explicit;
+      const domain = String(item.domain || "").trim();
+      return domain
+        ? `https://adstransparency.google.com/?domain=${encodeURIComponent(domain)}&region=BR`
+        : "https://adstransparency.google.com/?region=BR";
+    }
+
+    function renderRankings(data) {
+      const competitors = $("#competitor-ranking");
+      if (!data.competitors.length) {
+        competitors.innerHTML = '<li class="empty"><i class="fa-solid fa-building-circle-xmark"></i>Nenhum concorrente observado neste recorte.</li>';
+      } else {
+        competitors.innerHTML = data.competitors.slice(0, 8).map((item, index) => `<li class="rank-row"><span class="rank-pos">${index + 1}</span><div class="rank-name"><strong>${escapeHtml(item.name || item.domain || "Anunciante")}</strong><span>${escapeHtml(item.domain || "domínio não informado")} · ${formatNumber(item.presenceRate)}% de presença na amostra · ${formatNumber(item.regions)} regiões</span></div><div class="rank-metrics"><span class="metric-mini"><b>${formatNumber(item.uniqueAds)}</b><small>únicos observados</small></span><span class="metric-mini"><b>${formatNumber(item.appearances)}</b><small>aparições</small></span><div class="rank-actions"><a class="button ghost" href="${escapeHtml(transparencyUrl(item))}" target="_blank" rel="noopener noreferrer" aria-label="Consultar ${escapeHtml(item.domain || item.name)} no Google Ads Transparency"><i class="fa-brands fa-google"></i>Transparência</a></div></div></li>`).join("");
+      }
+
+      const queries = $("#query-ranking");
+      if (!data.queries.length) {
+        queries.innerHTML = '<li class="empty"><i class="fa-solid fa-magnifying-glass"></i>Nenhuma consulta observada neste recorte.</li>';
+      } else {
+        queries.innerHTML = data.queries.slice(0, 8).map((item, index) => `<li class="rank-row"><span class="rank-pos">${index + 1}</span><div class="rank-name"><strong>${escapeHtml(item.query || "Consulta")}</strong><span>${formatNumber(item.competitors)} concorrentes · ${formatNumber(item.searches)} buscas concluídas${item.failures ? ` · ${formatNumber(item.failures)} falhas` : ""}</span></div><div class="rank-metrics"><span class="metric-mini"><b>${formatNumber(item.uniqueAds)}</b><small>únicos observados</small></span><span class="metric-mini"><b>${formatNumber(item.appearances)}</b><small>aparições</small></span></div></li>`).join("");
+      }
+    }
+
+    function landingButton(url) {
+      const safe = safeLandingUrl(url);
+      return safe
+        ? `<a class="button ghost" href="${escapeHtml(safe)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i>Abrir landing direta</a>`
+        : '<span class="chip">Landing indisponível</span>';
+    }
+
+    function renderEvidence(data) {
+      const grid = $("#evidence-grid");
+      if (!data.observations.length) {
+        grid.innerHTML = '<div class="empty"><i class="fa-regular fa-rectangle-list"></i>Nenhum anúncio observado com os filtros selecionados.</div>';
+        return;
+      }
+      grid.innerHTML = data.observations.slice(0, 9).map((item) => {
+        const transparency = transparencyUrl({ domain: item.domain });
+        return `<article class="card evidence-card"><div class="ad-preview"><small>${escapeHtml(item.advertiser)}</small><p>${escapeHtml(item.description)}</p></div><div class="evidence-body"><span class="tag collected" style="align-self:flex-start;margin-bottom:9px">Dado coletado</span><h3>${escapeHtml(item.title)}</h3><div class="domain">${escapeHtml(item.domain || item.targetUrl)}</div><div class="chips"><span class="chip">${escapeHtml(item.keyword || "consulta não informada")}</span><span class="chip">${escapeHtml(item.location || "região não informada")}</span><span class="chip">${escapeHtml(item.device || "dispositivo não informado")}</span></div><div class="source-line"><span>Fonte: Google Ads observado</span><span>·</span><span>${escapeHtml(formatDate(item.observedAt, true))}</span><span>·</span><span class="confidence">Confiança alta</span></div><div class="evidence-footer"><div class="evidence-actions">${landingButton(item.targetUrl)}<a class="button ghost" href="${escapeHtml(transparency)}" target="_blank" rel="noopener noreferrer" aria-label="Consultar ${escapeHtml(item.domain)} no Google Ads Transparency"><i class="fa-brands fa-google"></i>Transparência</a></div></div></div></article>`;
+      }).join("");
+    }
+
+    function renderLandings(data) {
+      const grid = $("#landing-grid");
+      if (!data.landingPages.length) {
+        grid.innerHTML = '<div class="empty"><i class="fa-regular fa-window-maximize"></i>Nenhuma landing page observada neste recorte.</div>';
+        return;
+      }
+      grid.innerHTML = data.landingPages.slice(0, 6).map((item) => {
+        const screenshot = safeUrl(item.screenshotUrl || item.screenshot_path, true);
+        const captured = item.snapshotStatus === "captured" || Boolean(screenshot);
+        const failed = item.snapshotStatus === "failed";
+        const whatsapp = captured && firstArray(item.whatsappLinks, item.whatsapp_links).length > 0;
+        const subtitle = Array.isArray(item.h2) ? item.h2.join(" · ") : item.h2 || item.description || "Conteúdo secundário não extraído.";
+        const signals = [];
+        if (item.primaryCta) signals.push(`CTA: ${item.primaryCta}`);
+        if (item.formFields?.length) signals.push(`${item.formFields.length} formulário(s)`);
+        if (item.faqEntries?.length) signals.push(`${item.faqEntries.length} FAQ(s)`);
+        if (item.socialProof?.length) signals.push("Prova social observada");
+        if (item.urgencySignals?.length) signals.push("Urgência observada");
+        if (item.authoritySignals?.length) signals.push("Autoridade observada");
+        const tagClass = captured ? "collected" : "warning";
+        const tagText = captured ? "Captura concluída" : failed ? "Captura falhou" : "URL observada";
+        const sourceText = captured ? "Captura passiva" : failed ? "Falha de captura registrada" : "Página ainda não capturada";
+        const confidenceText = captured ? "Confiança alta" : "Sem inferência";
+        const chips = [
+          whatsapp ? "WhatsApp observado" : captured ? "WhatsApp não observado" : "WhatsApp não verificado",
+          ...signals,
+          item.domain || "domínio não informado",
+        ];
+        return `<article class="card landing-card"><div class="landing-shot">${screenshot ? `<img src="${escapeHtml(screenshot)}" alt="Captura observada da landing page de ${escapeHtml(item.advertiser || item.domain)}" loading="lazy">` : '<div class="landing-placeholder"><i class="fa-regular fa-image"></i></div>'}</div><div class="landing-body"><span class="tag ${tagClass}" style="align-self:flex-start;margin-bottom:8px">${tagText}</span><h3>${escapeHtml(item.h1 || item.title || "Headline não identificada")}</h3><p>${escapeHtml(subtitle)}</p><div class="chips">${chips.map((chip) => `<span class="chip">${escapeHtml(chip)}</span>`).join("")}</div><div class="source-line"><span>${sourceText}</span><span>·</span><span>${escapeHtml(formatDate(item.capturedAt || item.observedAt, true))}</span><span>·</span><span class="confidence">${confidenceText}</span></div><div class="evidence-footer">${landingButton(item.targetUrl || item.url)}</div></div></article>`;
+      }).join("");
+      $$(".landing-shot img", grid).forEach((image) => image.addEventListener("error", () => {
+        image.parentElement.innerHTML = '<div class="landing-placeholder"><i class="fa-regular fa-image"></i></div>';
+      }, { once: true }));
+    }
+
+    function renderDashboard(data) {
+      state.dashboard = data;
+      renderKpis(data);
+      renderInsights(data);
+      renderTrend(data);
+      renderRankings(data);
+      renderEvidence(data);
+      renderLandings(data);
+      $("#dashboard-content").setAttribute("aria-busy", "false");
+      $("#dashboard-source").innerHTML = `<i class="fa-solid fa-database"></i><span>${escapeHtml(data.meta.source)}</span><span>·</span><span>Painel atualizado ${escapeHtml(formatDate(data.meta.generatedAt, true))}</span><span>·</span><span class="confidence">Confiança ${escapeHtml(data.meta.confidence)}</span>`;
+      const coverage = data.meta.coverage;
+      $("#coverage-strip").innerHTML = coverage
+        ? `<span class="tag collected">Dado coletado</span><span><b>${formatNumber(coverage.completed)}</b> buscas concluídas</span><span><b>${formatNumber(coverage.failed)}</b> falhas</span><span><b>${formatNumber(coverage.queries)}</b> consultas</span><span><b>${formatNumber(coverage.locations)}</b> regiões</span><span><b>${formatNumber(coverage.devices)}</b> dispositivos</span>`
+        : '<span class="tag collected">Dado coletado</span><span>Cobertura detalhada indisponível no modo de contingência.</span>';
+      const freshness = $("#freshness-badge");
+      freshness.className = "pill";
+      freshness.innerHTML = `<i class="fa-regular fa-clock"></i><span>Dados até ${escapeHtml(formatDate(data.meta.dataUntil || data.meta.generatedAt, true))}</span>`;
+      const methodologyValues = Object.values(data.meta.methodology || {}).flatMap((value) => {
+        if (typeof value === "string") return [value];
+        if (value && typeof value === "object") return Object.values(value).filter((item) => typeof item === "string");
+        return [];
+      });
+      $("#methodology-list").innerHTML = (methodologyValues.length ? methodologyValues : [
+        "O painel conta apenas anúncios observados nas consultas executadas.",
+        "Os totais não representam investimento, participação de mercado ou inventário completo do anunciante.",
+      ]).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+    }
+
+    function renderDashboardLoading() {
+      $("#dashboard-content").setAttribute("aria-busy", "true");
+      $("#kpi-grid").innerHTML = Array.from({ length: 5 }, () => '<div class="kpi"><div class="skeleton" style="height:34px;width:34px"></div><div class="skeleton" style="height:27px;width:55%;margin-top:18px"></div><div class="skeleton" style="height:12px;width:80%;margin-top:8px"></div></div>').join("");
+      $("#insights-list").innerHTML = '<div class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Carregando leitura…</div>';
+      $("#trend-chart").innerHTML = '<div class="loading-state" style="width:100%"><i class="fa-solid fa-circle-notch fa-spin"></i>Carregando tendência…</div>';
+      $("#competitor-ranking").innerHTML = '<li class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Carregando concorrentes…</li>';
+      $("#query-ranking").innerHTML = '<li class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Carregando consultas…</li>';
+      $("#evidence-grid").innerHTML = '<div class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Carregando evidências…</div>';
+      $("#landing-grid").innerHTML = '<div class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Carregando landing pages…</div>';
+    }
+
+    function renderDashboardError(message) {
+      const html = `<div class="error-state"><i class="fa-solid fa-circle-exclamation"></i>${escapeHtml(message)}<br><button class="button secondary" type="button" data-action="retry-dashboard" style="margin-top:12px">Tentar novamente</button></div>`;
+      $("#kpi-grid").innerHTML = html;
+      ["#insights-list", "#trend-chart", "#competitor-ranking", "#query-ranking", "#evidence-grid", "#landing-grid"].forEach((selector) => $(selector).innerHTML = "");
+      $("#dashboard-source").innerHTML = "";
+      $("#coverage-strip").innerHTML = "";
+      $("#freshness-badge").innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>Dados indisponíveis</span>';
+      $("#methodology-list").innerHTML = "";
+      $("#dashboard-content").setAttribute("aria-busy", "false");
+    }
+
+    async function loadDashboard() {
+      const sequence = ++state.dashboardSequence;
+      renderDashboardLoading();
+      try {
+        const raw = await fetchJson(`/api/radar/dashboard?${dashboardQueryString()}`, {}, 25000);
+        if (sequence !== state.dashboardSequence) return;
+        renderDashboard(normalizeDashboard(raw));
+      } catch (dashboardError) {
+        try {
+          const legacy = await fetchJson("/api/radar/observations", {}, 25000);
+          if (sequence !== state.dashboardSequence) return;
+          const observations = firstArray(legacy.observations, legacy.items, legacy.results);
+          renderDashboard(deriveDashboard(observations));
+          showStatus("A visão consolidada ainda não respondeu; o painel foi derivado das observações disponíveis.", "info");
+        } catch (_) {
+          if (sequence !== state.dashboardSequence) return;
+          renderDashboardError(dashboardError.message || "Não foi possível carregar o painel.");
+        }
+      }
+    }
+
+    function openConfirmation() {
+      if (!state.plan || !state.plan.searches.length || !state.plan.sufficient || state.scanning) return;
+      const plan = state.plan;
+      $("#dialog-summary").innerHTML = `<div class="summary-box"><b>${formatNumber(plan.estimatedSearches)}</b><span>consultas estimadas</span></div><div class="summary-box"><b>${formatNumber(state.filters.regions.length)}</b><span>regiões</span></div><div class="summary-box"><b>${formatNumber(plan.remaining)}</b><span>saldo antes</span></div>`;
+      const warning = $("#dialog-warning");
+      warning.hidden = !plan.fallback && !plan.limited;
+      if (plan.fallback && plan.limited) warning.textContent = "O endpoint de planejamento não respondeu e o plano foi limitado localmente a 24 consultas. Os termos omitidos estão identificados abaixo.";
+      else if (plan.fallback) warning.textContent = "O endpoint de planejamento não respondeu. Esta é uma estimativa local transparente baseada nas variações exibidas abaixo.";
+      else if (plan.limited) warning.textContent = "Plano limitado a 24 consultas para distribuir o custo entre as regiões e dispositivos selecionados.";
+      const visible = plan.searches.slice(0, 20);
+      $("#dialog-plan").innerHTML = visible.map((item, index) => `<li><b>${index + 1}</b><span><strong>${escapeHtml(item.keyword)}</strong><br>${escapeHtml(item.location)} · ${escapeHtml(item.device)}</span></li>`).join("")
+        + (plan.searches.length > visible.length ? `<li><b>+</b><span>Mais ${plan.searches.length - visible.length} combinações incluídas no plano.</span></li>` : "")
+        + (plan.omittedKeywords?.length ? `<li><b>!</b><span><strong>Termos omitidos pelo teto de custo:</strong><br>${escapeHtml(plan.omittedKeywords.join(" · "))}</span></li>` : "");
+      $("#confirm-dialog").showModal();
+    }
+
+    async function executePlan() {
+      if (state.scanning || !state.plan?.searches.length) return;
+      $("#confirm-dialog").close();
+      state.scanning = true;
+      state.cancelRequested = false;
+      const executionService = state.filters.service;
+      const executionSearches = state.plan.searches.map((item) => ({ ...item }));
+      $("#cancel-scan").disabled = false;
+      $("#cancel-scan").textContent = "Parar após esta busca";
+      renderPlan();
+      const panel = $("#progress-panel");
+      panel.hidden = false;
+      const total = executionSearches.length;
+      let completed = 0;
+      let adsObserved = 0;
+      const failures = [];
+
+      for (const [index, item] of executionSearches.entries()) {
+        if (state.cancelRequested) break;
+        const progress = Math.round((completed / total) * 100);
+        $("#progress-title").textContent = "Executando varredura sequencial";
+        $("#progress-count").textContent = `${completed} / ${total}`;
+        $("#progress-detail").textContent = `${item.keyword} · ${item.location} · ${item.device}`;
+        $("#progress-bar").style.width = `${progress}%`;
+        $(".progress-track").setAttribute("aria-valuenow", String(progress));
+        try {
+          const result = await fetchJson("/api/radar/scan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ keyword: item.keyword, location: item.location, device: item.device, service: executionService }),
+          }, null);
+          adsObserved += firstNumber(result.ads_found, result.observations_saved, result.ads_observed);
+        } catch (error) {
+          failures.push({ index, item, message: error.message });
+        }
+        completed += 1;
+      }
+
+      const finalProgress = Math.round((completed / total) * 100);
+      $("#progress-count").textContent = `${completed} / ${total}`;
+      $("#progress-bar").style.width = `${finalProgress}%`;
+      $(".progress-track").setAttribute("aria-valuenow", String(finalProgress));
+      $("#progress-detail").textContent = state.cancelRequested
+        ? `Plano interrompido com segurança após ${completed} consultas.`
+        : `${completed} consultas concluídas; ${adsObserved} aparições retornadas antes da consolidação.`;
+      state.scanning = false;
+      renderPlan();
+      if (failures.length) showStatus(`${completed - failures.length} consultas concluídas e ${failures.length} falharam. Os dados válidos foram preservados.`, "error");
+      else if (state.cancelRequested) showStatus("Varredura interrompida. Nenhuma consulta adicional será iniciada.", "info");
+      else showStatus(`Varredura concluída: ${completed} consultas executadas sob demanda.`, "success");
+      await Promise.allSettled([loadQuota(), loadDashboard(), loadPlan()]);
+    }
+
+    function scheduleRefresh() {
+      syncFilters();
+      clearTimeout(state.planTimer);
+      clearTimeout(state.dashboardTimer);
+      state.planTimer = setTimeout(loadPlan, 280);
+      state.dashboardTimer = setTimeout(loadDashboard, 350);
+    }
+
+    $$("[data-period]").forEach((button) => button.addEventListener("click", () => {
+      state.filters.period = Number(button.dataset.period);
+      $$("[data-period]").forEach((item) => {
+        const active = item === button;
+        item.classList.toggle("active", active);
+        item.setAttribute("aria-pressed", String(active));
+      });
+      scheduleRefresh();
+    }));
+    $("#service-filter").addEventListener("change", scheduleRefresh);
+    $("#device-filter").addEventListener("change", scheduleRefresh);
+    $$("input[name='scan-mode']").forEach((input) => input.addEventListener("change", scheduleRefresh));
+    function handleRegionChange(input) {
+      if (!selectedRegions().length) {
+        input.checked = true;
+        showStatus("Mantenha pelo menos uma região selecionada para preservar o recorte do painel.", "info");
+      }
+      scheduleRefresh();
+    }
+    $$("input[name='region']").forEach((input) => input.addEventListener("change", () => handleRegionChange(input)));
+    function addCustomRegion() {
+      const field = $("#custom-region");
+      const value = field.value.trim().replace(/\s+/g, " ");
+      if (value.length < 2) {
+        showStatus("Digite uma cidade ou região válida.", "info");
+        field.focus();
+        return;
+      }
+      if (value.includes(",")) {
+        showStatus("Adicione uma localização por vez, sem vírgulas.", "info");
+        field.focus();
+        return;
+      }
+      const existing = $$("input[name='region']").find((input) => input.value.toLocaleLowerCase("pt-BR") === value.toLocaleLowerCase("pt-BR"));
+      if (existing) {
+        existing.checked = true;
+        handleRegionChange(existing);
+      } else {
+        const label = document.createElement("label");
+        label.className = "check-row";
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.name = "region";
+        input.value = value;
+        input.checked = true;
+        input.addEventListener("change", () => handleRegionChange(input));
+        label.append(input, document.createTextNode(value));
+        $(".region-add").before(label);
+        handleRegionChange(input);
+      }
+      field.value = "";
+    }
+    $("#add-region").addEventListener("click", addCustomRegion);
+    $("#custom-region").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        addCustomRegion();
+      }
+    });
+    $("#review-scan").addEventListener("click", openConfirmation);
+    $("#dialog-close").addEventListener("click", () => $("#confirm-dialog").close());
+    $("#dialog-cancel").addEventListener("click", () => $("#confirm-dialog").close());
+    $("#confirm-scan").addEventListener("click", executePlan);
+    $("#cancel-scan").addEventListener("click", () => {
+      state.cancelRequested = true;
+      $("#cancel-scan").disabled = true;
+      $("#cancel-scan").textContent = "Interrupção solicitada";
+    });
+    document.addEventListener("click", (event) => {
+      if (event.target.closest("[data-action='retry-dashboard']")) loadDashboard();
+    });
+
+    function setMenu(open) {
+      document.body.classList.toggle("menu-open", open);
+      $("#menu-open").setAttribute("aria-expanded", String(open));
+      const mobile = window.matchMedia("(max-width: 920px)").matches;
+      $("#sidebar").toggleAttribute("inert", mobile && !open);
+      $("#sidebar").setAttribute("aria-hidden", String(mobile && !open));
+    }
+    $("#menu-open").addEventListener("click", () => setMenu(!document.body.classList.contains("menu-open")));
+    $("#menu-overlay").addEventListener("click", () => setMenu(false));
+    $$(".sidebar .nav-link").forEach((link) => link.addEventListener("click", () => setMenu(false)));
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && document.body.classList.contains("menu-open")) setMenu(false);
+    });
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        setMenu(document.body.classList.contains("menu-open") && window.matchMedia("(max-width: 920px)").matches);
+        if (state.dashboard) renderTrend(state.dashboard);
+      }, 120);
+    });
+
+    async function initialize() {
+      setMenu(false);
+      syncFilters();
+      await loadQuota();
+      await Promise.allSettled([loadPlan(), loadDashboard()]);
+    }
+    initialize();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
   <title>Radar de Inteligência Google Ads | PFA</title>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
