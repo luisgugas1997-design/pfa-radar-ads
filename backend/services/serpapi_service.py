@@ -78,8 +78,16 @@ async def buscar_anuncios_google(
             response.raise_for_status()
             resposta = response.json()
     except httpx.HTTPStatusError as erro:
+        detalhe = None
+        try:
+            corpo_erro = erro.response.json()
+            if isinstance(corpo_erro, dict) and corpo_erro.get("error"):
+                detalhe = str(corpo_erro["error"])[:500]
+        except ValueError:
+            detalhe = None
+        sufixo = f": {detalhe}" if detalhe else ""
         raise RuntimeError(
-            f"A SerpApi respondeu com HTTP {erro.response.status_code}."
+            f"A SerpApi respondeu com HTTP {erro.response.status_code}{sufixo}."
         ) from erro
     except httpx.RequestError as erro:
         raise RuntimeError("Falha de rede ao consultar a SerpApi.") from erro
