@@ -54,7 +54,7 @@ def montar_parametros_busca(
         "google_domain": "google.com.br",
         "gl": "br",
         "hl": "pt",
-        "no_cache": "true",
+        "no_cache": "false",
     }
 
 

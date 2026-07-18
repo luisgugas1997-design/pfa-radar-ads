@@ -55,6 +55,7 @@ def test_parametros_serpapi_usam_localizacao_e_idioma_canonicos() -> None:
     assert parametros["hl"] == "pt"
     assert parametros["gl"] == "br"
     assert parametros["google_domain"] == "google.com.br"
+    assert parametros["no_cache"] == "false"
 
 
 def test_plano_completo_respeita_limite_de_24_creditos() -> None:
