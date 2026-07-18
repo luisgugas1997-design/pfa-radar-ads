@@ -10,6 +10,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.database import engine, get_db, initialize_database
@@ -129,6 +130,37 @@ async def listar_observacoes(
         }
 
     return {"search_run": busca_atual, "observations": observacoes}
+
+
+@app.get("/api/radar/search-runs", dependencies=RADAR_PROTEGIDO)
+async def listar_execucoes_busca(
+    limit: int = Query(default=20, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    execucoes = (
+        await db.scalars(
+            select(SearchRun)
+            .order_by(SearchRun.requested_at.desc())
+            .limit(limit)
+        )
+    ).all()
+    return {
+        "runs": [
+            {
+                "id": execucao.id,
+                "service": execucao.service_name,
+                "keyword": execucao.keyword,
+                "location": execucao.region_name,
+                "device": execucao.device,
+                "status": execucao.status,
+                "ads_found": execucao.ads_found,
+                "requested_at": execucao.requested_at,
+                "completed_at": execucao.completed_at,
+                "error": execucao.error_message,
+            }
+            for execucao in execucoes
+        ]
+    }
 
 
 @app.get("/api/radar/dashboard", dependencies=RADAR_PROTEGIDO)
