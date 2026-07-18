@@ -1,5 +1,6 @@
 import asyncio
 import os
+from pathlib import Path
 from types import SimpleNamespace
 from urllib.parse import quote
 
@@ -25,6 +26,22 @@ from backend.services.orchestrator import extrair_url_destino
 from backend.services.scraper import capturar_landing_page
 from backend.services.search_planner import criar_plano_busca
 from backend.services.serpapi_service import montar_parametros_busca
+
+
+def test_frontend_local_redireciona_para_painel_https() -> None:
+    html = (
+        Path(__file__).resolve().parent.parent
+        / "frontend"
+        / "radar_mockup.html"
+    ).read_text(encoding="utf-8")
+
+    assert 'window.location.protocol === "file:"' in html
+    assert (
+        'window.location.replace('
+        '"https://chatwoot-radar-api.phqoes.easypanel.host/radar"'
+        ")"
+    ) in html
+    assert '"http://localhost:8000"' not in html
 
 
 def test_plano_economico_nao_executa_e_calcula_creditos() -> None:
