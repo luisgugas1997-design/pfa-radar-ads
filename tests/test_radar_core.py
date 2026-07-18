@@ -24,6 +24,7 @@ from backend.services.dashboard_service import (
 from backend.services.orchestrator import extrair_url_destino
 from backend.services.scraper import capturar_landing_page
 from backend.services.search_planner import criar_plano_busca
+from backend.services.serpapi_service import montar_parametros_busca
 
 
 def test_plano_economico_nao_executa_e_calcula_creditos() -> None:
@@ -37,6 +38,23 @@ def test_plano_economico_nao_executa_e_calcula_creditos() -> None:
     assert plano["estimated_credits"] == len(plano["matrix"])
     assert plano["estimated_credits"] == 6
     assert all(item["estimated_credits"] == 1 for item in plano["matrix"])
+
+
+def test_parametros_serpapi_usam_localizacao_e_idioma_canonicos() -> None:
+    parametros = montar_parametros_busca(
+        "defesa lei seca",
+        "São Bernardo do Campo",
+        "mobile",
+        "chave-teste",
+    )
+
+    assert parametros["engine"] == "google_ads"
+    assert parametros["location"] == (
+        "Sao Bernardo do Campo,State of Sao Paulo,Brazil"
+    )
+    assert parametros["hl"] == "pt"
+    assert parametros["gl"] == "br"
+    assert parametros["google_domain"] == "google.com.br"
 
 
 def test_plano_completo_respeita_limite_de_24_creditos() -> None:

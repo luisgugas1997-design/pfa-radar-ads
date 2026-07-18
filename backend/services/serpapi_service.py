@@ -15,8 +15,8 @@ load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 SERPAPI_URL = "https://serpapi.com/search"
 SERPAPI_ACCOUNT_URL = "https://serpapi.com/account.json"
 logger = logging.getLogger("uvicorn.error")
-SERPAPI_LOCATION_IDS = {
-    "sao bernardo do campo": "585069a2ee19ad271e9b4f84",
+SERPAPI_LOCATIONS = {
+    "sao bernardo do campo": "Sao Bernardo do Campo,State of Sao Paulo,Brazil",
 }
 
 
@@ -36,7 +36,26 @@ def _inteiro_ou_none(valor: Any) -> int | None:
 def obter_localizacao_serpapi(location: str) -> str:
     chave = unicodedata.normalize("NFKD", location.strip().casefold())
     chave = chave.encode("ascii", "ignore").decode("ascii")
-    return SERPAPI_LOCATION_IDS.get(chave, location)
+    return SERPAPI_LOCATIONS.get(chave, location)
+
+
+def montar_parametros_busca(
+    keyword: str,
+    location: str,
+    device: str,
+    api_key: str,
+) -> dict[str, str]:
+    return {
+        "engine": "google_ads",
+        "q": keyword,
+        "location": obter_localizacao_serpapi(location),
+        "device": device,
+        "api_key": api_key,
+        "google_domain": "google.com.br",
+        "gl": "br",
+        "hl": "pt",
+        "no_cache": "true",
+    }
 
 
 async def buscar_anuncios_google(
@@ -49,17 +68,7 @@ async def buscar_anuncios_google(
     if not api_key:
         raise RuntimeError("SERPAPI_KEY não está configurada no servidor.")
 
-    params = {
-        "engine": "google_ads",
-        "q": keyword,
-        "location": obter_localizacao_serpapi(location),
-        "device": device,
-        "api_key": api_key,
-        "google_domain": "google.com.br",
-        "gl": "br",
-        "hl": "pt-br",
-        "no_cache": "true",
-    }
+    params = montar_parametros_busca(keyword, location, device, api_key)
     params_para_log = {**params, "api_key": "[oculta]"}
     logger.info("SerpApi request: %s?%s", SERPAPI_URL, urlencode(params_para_log))
 
