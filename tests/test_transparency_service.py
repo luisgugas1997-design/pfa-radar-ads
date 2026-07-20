@@ -291,3 +291,44 @@ def test_helper_de_perfil_retorna_contrato_serializavel_sem_payload_sensivel() -
     assert "raw_payload" not in resultado["latest_scan"]
     assert "raw_payload" not in resultado["creatives"][0]
     assert "serpapi_details_link" not in resultado["creatives"][0]
+
+
+def test_executar_scan_aceita_nome_observado_sem_alterar_anunciante(
+    monkeypatch,
+) -> None:
+    consultas = []
+
+    async def busca_falsa(consulta, _num):
+        consultas.append(consulta)
+        return ResultadoTransparency(
+            raw_payload={"ad_creatives": []},
+            provider_search_id="search-name",
+            total_results=0,
+            creatives=[],
+            next_page_token=None,
+        )
+
+    monkeypatch.setattr(
+        transparency_module,
+        "buscar_criativos_transparencia",
+        busca_falsa,
+    )
+    advertiser = Advertiser(
+        id=7,
+        display_name="Concorrente Jurídico LTDA",
+        domain="concorrente.example",
+    )
+    session = SessaoFalsa()
+
+    scan = asyncio.run(
+        executar_transparency_scan(
+            session,
+            advertiser,
+            num=100,
+            advertiser_query="Concorrente Jurídico LTDA",
+        )
+    )
+
+    assert consultas == ["Concorrente Jurídico LTDA"]
+    assert scan.advertiser_id == 7
+    assert scan.advertiser_query == "Concorrente Jurídico LTDA"

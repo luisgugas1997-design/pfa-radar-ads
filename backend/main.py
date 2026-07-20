@@ -50,6 +50,7 @@ class TransparencyScanRequest(BaseModel):
 
     confirm_cost: Literal[True]
     num: int = Field(default=100, ge=1, le=100)
+    query_mode: Literal["domain", "advertiser_name"] = "domain"
 
 
 @asynccontextmanager
@@ -255,14 +256,27 @@ async def obter_perfil_anunciante(
 ) -> dict:
     if advertiser_id < 1:
         raise HTTPException(status_code=422, detail="ID de anunciante invÃ¡lido.")
-    resultado = await obter_perfil_anunciante_observado(
-        db,
-        advertiser_id,
-        days=days,
-        service=service,
-        location=location,
-        device=device,
-    )
+    try:
+        resultado = await obter_perfil_anunciante_observado(
+            db,
+            advertiser_id,
+            days=days,
+            service=service,
+            location=location,
+            device=device,
+        )
+    except Exception as erro:
+        logger.exception(
+            "Falha ao montar perfil observado do anunciante %s",
+            advertiser_id,
+        )
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "O perfil analítico não pôde ser montado. "
+                "O erro foi registrado para diagnóstico."
+            ),
+        ) from erro
     if resultado is None:
         raise HTTPException(
             status_code=404,
@@ -400,6 +414,12 @@ async def executar_scan_transparencia(
                 db,
                 anunciante,
                 num=request.num,
+                advertiser_query=(
+                    anunciante.display_name
+                    if request.query_mode == "advertiser_name"
+                    and anunciante.display_name
+                    else anunciante.domain
+                ),
             )
             return {
                 "status": "sucesso",

@@ -1499,8 +1499,13 @@
       }));
       return {
         items,
+        query: container.latest_scan?.advertiser_query || "",
         observedAt: container.latest_scan?.completed_at || container.latest_scan?.requested_at || container.observed_at || container.collected_at || container.updated_at || raw.observed_at || new Date().toISOString(),
       };
+    }
+
+    function transparencyScanActions() {
+      return `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px"><button class="button primary" type="button" data-action="scan-transparency" data-query-mode="domain"><i class="fa-solid fa-globe"></i>Consultar pelo domínio (~1 crédito)</button><button class="button secondary" type="button" data-action="scan-transparency" data-query-mode="advertiser_name"><i class="fa-solid fa-building"></i>Consultar pelo nome (~1 crédito)</button></div>`;
     }
 
     function renderTransparencyState() {
@@ -1527,11 +1532,11 @@
             const image = safeUrl(item.imageUrl);
             return `<article class="profile-card">${image ? `<img class="transparency-image" src="${escapeHtml(image)}" alt="Prévia do criativo observado no Centro de Transparência" loading="lazy">` : ""}<span class="tag collected">Transparência Google / observado</span><h4>${escapeHtml(item.title)}</h4><p>${escapeHtml(item.description)}</p><div class="chips"><span class="chip">${escapeHtml(item.format)}</span></div><div class="source-line"><span>${escapeHtml(formatDate(item.firstShown))}</span><span>→</span><span>${escapeHtml(formatDate(item.lastShown))}</span></div>${preview ? `<a class="button ghost" href="${escapeHtml(preview)}" target="_blank" rel="noopener noreferrer" style="margin-top:9px">Abrir criativo no Google</a>` : ""}</article>`;
           }).join("")}</div>`
-          : profileEmpty("fa-rectangle-ad", "Nenhum criativo foi retornado nessa consulta. Isso não comprova ausência de campanhas.");
-        container.innerHTML = `<div class="source-line"><span>${formatNumber(data.items.length)} criativos retornados</span><span>·</span><span>Consulta de ${escapeHtml(formatDate(data.observedAt, true))}</span></div>${results}<button class="button primary" type="button" data-action="scan-transparency" style="margin-top:12px"><i class="fa-solid fa-magnifying-glass"></i>Nova consulta manual (~1 crédito)</button>`;
+          : profileEmpty("fa-rectangle-ad", `Nenhum criativo foi retornado para ${data.query ? `“${data.query}”` : "esta consulta"}. O anunciante pode estar registrado com outro nome jurídico; isso não comprova ausência de campanhas.`);
+        container.innerHTML = `<div class="source-line"><span>${formatNumber(data.items.length)} criativos retornados</span><span>·</span><span>Consulta de ${escapeHtml(formatDate(data.observedAt, true))}</span>${data.query ? `<span>·</span><span>Busca: ${escapeHtml(data.query)}</span>` : ""}</div>${results}${transparencyScanActions()}`;
         return;
       }
-      container.innerHTML = '<div class="inline-state">Consulte resultados já armazenados ou inicie manualmente uma única busca, sem paginação automática.</div><button class="button primary" type="button" data-action="scan-transparency" style="margin-top:12px"><i class="fa-solid fa-magnifying-glass"></i>Consultar manualmente (~1 crédito)</button>';
+      container.innerHTML = `<div class="inline-state">Consulte pelo domínio ou pelo nome observado. Cada botão executa somente uma consulta, sem paginação automática.</div>${transparencyScanActions()}`;
     }
 
     async function loadTransparencyStored() {
@@ -1555,11 +1560,14 @@
       renderTransparencyState();
     }
 
-    async function executeTransparencyScan() {
+    async function executeTransparencyScan(queryMode = "domain") {
       const profile = state.advertiserProfile;
       const advertiserId = profile.data?.advertiser?.advertiserId || profile.reference?.advertiserId;
       if (!advertiserId || profile.transparency.status === "loading") return;
-      const confirmed = window.confirm("Confirmar consulta manual ao Centro de Transparência? A estimativa é de 1 crédito para até 100 criativos, sem paginação automática.");
+      const queryLabel = queryMode === "advertiser_name"
+        ? (profile.data?.advertiser?.name || profile.reference?.name || "nome observado")
+        : (profile.data?.advertiser?.domain || profile.reference?.domain || "domínio observado");
+      const confirmed = window.confirm(`Confirmar uma consulta pelo ${queryMode === "advertiser_name" ? "nome" : "domínio"} “${queryLabel}”? A estimativa é de 1 crédito para até 100 criativos, sem paginação automática.`);
       if (!confirmed) return;
       profile.transparency = { status: "loading", data: null, message: "" };
       renderTransparencyState();
@@ -1567,7 +1575,7 @@
         const scanResult = await fetchJson(`/api/radar/advertisers/${encodeURIComponent(advertiserId)}/transparency/scan`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ confirm_cost: true, num: 100 }),
+          body: JSON.stringify({ confirm_cost: true, num: 100, query_mode: queryMode }),
         }, 60000);
         const storedResult = await fetchJson(`/api/radar/advertisers/${encodeURIComponent(advertiserId)}/transparency`, {}, 20000).catch(() => scanResult);
         profile.transparency = { status: "success", data: normalizeTransparency(storedResult), message: "" };
@@ -2047,8 +2055,9 @@
         loadLandingSnapshots(snapshotButton);
         return;
       }
-      if (event.target.closest("[data-action='scan-transparency']")) {
-        executeTransparencyScan();
+      const transparencyScanButton = event.target.closest("[data-action='scan-transparency']");
+      if (transparencyScanButton) {
+        executeTransparencyScan(transparencyScanButton.dataset.queryMode || "domain");
         return;
       }
       if (event.target.closest("[data-action='retry-transparency']")) {

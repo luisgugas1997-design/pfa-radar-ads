@@ -241,6 +241,339 @@ async def obter_perfil_anunciante_observado(
         return None
 
     inicio, fim = _janela(days)
+    filtros_busca = _filtros_busca(inicio, fim, service, location, device)
+    filtros = [
+        *filtros_busca,
+        SearchRun.status == "completed",
+        AdObservation.advertiser_id == advertiser_id,
+    ]
+    linhas = list(
+        (
+            await session.execute(
+                select(AdObservation, SearchRun, LandingPage)
+                .join(SearchRun, SearchRun.id == AdObservation.search_run_id)
+                .outerjoin(
+                    LandingPage,
+                    LandingPage.id == AdObservation.landing_page_id,
+                )
+                .where(*filtros)
+                .order_by(
+                    AdObservation.observed_at.desc(),
+                    AdObservation.id.desc(),
+                )
+            )
+        ).all()
+    )
+
+    ids_buscas_concluidas = set(
+        (
+            await session.scalars(
+                select(SearchRun.id)
+                .where(*filtros_busca, SearchRun.status == "completed")
+                .distinct()
+            )
+        ).all()
+    )
+    total_buscas = len(ids_buscas_concluidas)
+
+    fingerprints: set[str] = set()
+    buscas_com_presenca: set[int] = set()
+    consultas: set[str] = set()
+    regioes: set[str] = set()
+    landing_page_ids: set[int] = set()
+    primeira_observacao = None
+    ultima_observacao = None
+    termos_map: dict[str, dict] = {}
+    landings_map: dict[int, dict] = {}
+    criativos_map: dict[str, dict] = {}
+    timeline_map: dict[str, dict] = {}
+
+    for observacao, busca, pagina in linhas:
+        fingerprint = str(observacao.fingerprint or "").strip()
+        consulta = (busca.keyword or busca.service_name or "").strip()
+        instante = observacao.observed_at
+        fingerprints.add(fingerprint)
+        buscas_com_presenca.add(busca.id)
+        consultas.add(consulta)
+        regioes.add(busca.region_name)
+        primeira_observacao = (
+            instante
+            if primeira_observacao is None
+            else min(primeira_observacao, instante)
+        )
+        ultima_observacao = (
+            instante
+            if ultima_observacao is None
+            else max(ultima_observacao, instante)
+        )
+
+        termo = termos_map.setdefault(
+            consulta,
+            {
+                "query_observed": consulta,
+                "observations": 0,
+                "fingerprints": set(),
+                "search_runs": set(),
+                "locations": set(),
+                "devices": set(),
+                "last_observed_at": instante,
+            },
+        )
+        termo["observations"] += 1
+        termo["fingerprints"].add(fingerprint)
+        termo["search_runs"].add(busca.id)
+        termo["locations"].add(busca.region_name)
+        termo["devices"].add(busca.device)
+        termo["last_observed_at"] = max(termo["last_observed_at"], instante)
+
+        criativo = criativos_map.setdefault(
+            fingerprint,
+            {
+                "variation_fingerprint": fingerprint,
+                "title": observacao.title,
+                "description": observacao.description,
+                "target_url": observacao.target_url,
+                "observations": 0,
+                "queries": set(),
+                "locations": set(),
+                "devices": set(),
+                "first_observed_at": instante,
+                "last_observed_at": instante,
+            },
+        )
+        criativo["observations"] += 1
+        criativo["queries"].add(consulta)
+        criativo["locations"].add(busca.region_name)
+        criativo["devices"].add(busca.device)
+        criativo["first_observed_at"] = min(
+            criativo["first_observed_at"], instante
+        )
+        criativo["last_observed_at"] = max(
+            criativo["last_observed_at"], instante
+        )
+
+        dia = instante.astimezone(timezone.utc).date().isoformat()
+        timeline = timeline_map.setdefault(
+            dia,
+            {
+                "observed_day": dia,
+                "observations": 0,
+                "fingerprints": set(),
+                "search_runs": set(),
+            },
+        )
+        timeline["observations"] += 1
+        timeline["fingerprints"].add(fingerprint)
+        timeline["search_runs"].add(busca.id)
+
+        if pagina is None:
+            continue
+        landing_page_ids.add(pagina.id)
+        landing = landings_map.setdefault(
+            pagina.id,
+            {
+                "landing_page_id": pagina.id,
+                "canonical_url": pagina.canonical_url,
+                "domain": pagina.domain,
+                "observations": 0,
+                "fingerprints": set(),
+                "first_observed_at": instante,
+                "last_observed_at": instante,
+            },
+        )
+        landing["observations"] += 1
+        landing["fingerprints"].add(fingerprint)
+        landing["first_observed_at"] = min(
+            landing["first_observed_at"], instante
+        )
+        landing["last_observed_at"] = max(
+            landing["last_observed_at"], instante
+        )
+
+    query_items = [
+        {
+            "query_observed": item["query_observed"],
+            "observations": item["observations"],
+            "unique_ads_observed": len(item["fingerprints"]),
+            "search_runs_with_presence": len(item["search_runs"]),
+            "locations_observed": sorted(item["locations"], key=str.casefold),
+            "devices_observed": sorted(item["devices"], key=str.casefold),
+            "last_observed_at": item["last_observed_at"],
+        }
+        for item in termos_map.values()
+    ]
+    query_items.sort(
+        key=lambda item: (
+            -item["observations"],
+            str(item["query_observed"]).casefold(),
+        )
+    )
+    query_items = query_items[:50]
+
+    landing_items = [
+        {
+            "landing_page_id": item["landing_page_id"],
+            "canonical_url": item["canonical_url"],
+            "domain": item["domain"],
+            "observations": item["observations"],
+            "unique_ads_observed": len(item["fingerprints"]),
+            "first_observed_at": item["first_observed_at"],
+            "last_observed_at": item["last_observed_at"],
+        }
+        for item in landings_map.values()
+    ]
+    landing_items.sort(
+        key=lambda item: (-item["observations"], item["canonical_url"])
+    )
+    landing_items = landing_items[:50]
+    landing_ids_exibidos = {
+        item["landing_page_id"] for item in landing_items
+    }
+
+    snapshot_counts: dict[int, int] = {}
+    latest_by_landing: dict[int, LandingPageSnapshot] = {}
+    if landing_ids_exibidos:
+        snapshots = (
+            await session.scalars(
+                select(LandingPageSnapshot)
+                .where(
+                    LandingPageSnapshot.landing_page_id.in_(
+                        landing_ids_exibidos
+                    )
+                )
+                .order_by(
+                    LandingPageSnapshot.landing_page_id,
+                    LandingPageSnapshot.captured_at.desc(),
+                    LandingPageSnapshot.id.desc(),
+                )
+            )
+        ).all()
+        for snapshot in snapshots:
+            snapshot_counts[snapshot.landing_page_id] = (
+                snapshot_counts.get(snapshot.landing_page_id, 0) + 1
+            )
+            latest_by_landing.setdefault(snapshot.landing_page_id, snapshot)
+
+    for item in landing_items:
+        latest = latest_by_landing.get(item["landing_page_id"])
+        screenshot_url = None
+        if latest is not None and latest.screenshot_path:
+            screenshot_url = f"/screenshots/{Path(latest.screenshot_path).name}"
+        item["snapshot_count"] = snapshot_counts.get(
+            item["landing_page_id"], 0
+        )
+        item["latest_snapshot"] = (
+            {
+                "snapshot_id": latest.id,
+                "capture_status": latest.capture_status,
+                "screenshot_url": screenshot_url,
+                "h1": latest.h1,
+                "primary_cta": latest.primary_cta,
+                "whatsapp_url": latest.whatsapp_url,
+                "whatsapp_links": latest.whatsapp_links or [],
+                "captured_at": latest.captured_at,
+            }
+            if latest is not None
+            else None
+        )
+
+    creative_items = [
+        {
+            "variation_fingerprint": item["variation_fingerprint"],
+            "title": item["title"],
+            "description": item["description"],
+            "target_url": item["target_url"],
+            "observations": item["observations"],
+            "queries_observed": sorted(item["queries"], key=str.casefold),
+            "locations_observed": sorted(item["locations"], key=str.casefold),
+            "devices_observed": sorted(item["devices"], key=str.casefold),
+            "first_observed_at": item["first_observed_at"],
+            "last_observed_at": item["last_observed_at"],
+        }
+        for item in criativos_map.values()
+    ]
+    creative_items.sort(
+        key=lambda item: item["last_observed_at"], reverse=True
+    )
+    creative_items = creative_items[:50]
+
+    timeline_items = [
+        {
+            "observed_day": item["observed_day"],
+            "observations": item["observations"],
+            "unique_ads_observed": len(item["fingerprints"]),
+            "search_runs_with_presence": len(item["search_runs"]),
+        }
+        for item in timeline_map.values()
+    ]
+    timeline_items.sort(key=lambda item: item["observed_day"])
+    timeline_items = timeline_items[-366:]
+
+    resumo_dict = {
+        "observations": len(linhas),
+        "unique_ads_observed": len(fingerprints),
+        "search_runs_with_presence": len(buscas_com_presenca),
+        "queries_observed": len(consultas),
+        "regions_observed": len(regioes),
+        "landing_pages_observed": len(landing_page_ids),
+        "first_observed_at": primeira_observacao,
+        "last_observed_at": ultima_observacao,
+        "observed_presence_rate": (
+            round(100 * len(buscas_com_presenca) / total_buscas, 1)
+            if total_buscas
+            else 0.0
+        ),
+    }
+    filtros_resposta = {
+        "days": days,
+        "service": service,
+        "location": location,
+        "device": device,
+    }
+    advertiser_profile = {
+        "advertiser_id": anunciante.id,
+        "advertiser": anunciante.display_name or anunciante.domain,
+        "domain": anunciante.domain,
+        "first_seen_at": anunciante.first_seen_at,
+        **resumo_dict,
+    }
+    return {
+        "advertiser": advertiser_profile,
+        "advertiser_observed_profile": advertiser_profile,
+        "queries": query_items,
+        "top_queries_observed": query_items,
+        "landing_pages": landing_items,
+        "landing_pages_observed": landing_items,
+        "creatives": creative_items,
+        "recent_creative_variations_observed": creative_items,
+        "timeline": timeline_items,
+        "timeline_observed": timeline_items,
+        "metadata": _metadata(
+            inicio=inicio,
+            fim=fim,
+            freshness=ultima_observacao,
+            filters=filtros_resposta,
+        ),
+        "methodology": _methodology("advertiser_observed_profile"),
+        "caveats": BASE_CAVEATS,
+    }
+
+
+async def _obter_perfil_anunciante_observado_legado(
+    session: AsyncSession,
+    advertiser_id: int,
+    *,
+    days: int,
+    service: str | None = None,
+    location: str | None = None,
+    device: str | None = None,
+) -> dict | None:
+    """Implementação SQL anterior mantida temporariamente para comparação."""
+    anunciante = await session.get(Advertiser, advertiser_id)
+    if anunciante is None:
+        return None
+
+    inicio, fim = _janela(days)
     filtros = [
         *_filtros_busca(inicio, fim, service, location, device),
         SearchRun.status == "completed",

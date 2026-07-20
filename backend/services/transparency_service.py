@@ -174,8 +174,16 @@ async def executar_transparency_scan(
     session: AsyncSession,
     advertiser: Advertiser,
     num: int = 100,
+    advertiser_query: str | None = None,
 ) -> TransparencyScan:
-    advertiser_id, consulta = _identificar_anunciante_local(advertiser)
+    advertiser_id, dominio = _identificar_anunciante_local(advertiser)
+    consulta = (
+        advertiser_query.strip()
+        if isinstance(advertiser_query, str) and advertiser_query.strip()
+        else dominio
+    )
+    if len(consulta) > 255:
+        raise ValueError("A consulta do anunciante deve ter no máximo 255 caracteres.")
     if isinstance(num, bool) or not isinstance(num, int) or not 1 <= num <= 100:
         raise ValueError("num deve ser um inteiro entre 1 e 100.")
 
@@ -280,6 +288,7 @@ def resumir_transparency_scan(scan: TransparencyScan) -> dict[str, Any]:
     return {
         "id": scan.id,
         "advertiser_id": scan.advertiser_id,
+        "advertiser_query": scan.advertiser_query,
         "status": scan.status,
         "label": TRANSPARENCY_RESULT_LABEL,
         "creatives_found": scan.creatives_found,
