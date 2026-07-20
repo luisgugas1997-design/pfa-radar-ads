@@ -1730,9 +1730,17 @@
       let completed = 0;
       let adsObserved = 0;
       const failures = [];
+      // Espaçamento conservador entre consultas para evitar rajadas no provedor.
+      // O valor é local ao navegador e não cria um serviço permanente.
+      const delayBetweenSearchesMs = 1800;
+
+      const waitBetweenSearches = (milliseconds) => new Promise((resolve) => {
+        window.setTimeout(resolve, milliseconds);
+      });
 
       for (const [index, item] of executionSearches.entries()) {
         if (state.cancelRequested) break;
+        if (index > 0) await waitBetweenSearches(delayBetweenSearchesMs);
         const progress = Math.round((completed / total) * 100);
         $("#progress-title").textContent = "Executando varredura sequencial";
         $("#progress-count").textContent = `${completed} / ${total}`;
