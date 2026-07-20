@@ -391,6 +391,7 @@ async def obter_dashboard(
     service: str | None = Query(default=None),
     location: str | None = Query(default=None),
     device: str | None = Query(default=None),
+    time_window: Literal["all", "commercial", "blitz"] = Query(default="all"),
     db: AsyncSession = Depends(get_db),
 ) -> dict:
     try:
@@ -400,6 +401,7 @@ async def obter_dashboard(
             service=service,
             location=location,
             device=device,
+            time_window=time_window,
         )
     except ValueError as erro:
         raise HTTPException(status_code=422, detail=str(erro)) from erro

@@ -1,5 +1,6 @@
 import asyncio
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from urllib.parse import quote
@@ -20,6 +21,7 @@ import backend.services.orchestrator as orchestrator_module
 from backend.main import app
 from backend.services.dashboard_service import (
     _assinatura_anuncio,
+    _corresponde_janela_horaria,
     _nomes_historicos_do_servico,
 )
 from backend.services.orchestrator import extrair_url_destino
@@ -42,6 +44,26 @@ def test_frontend_local_redireciona_para_painel_https() -> None:
         ")"
     ) in html
     assert '"http://localhost:8000"' not in html
+    assert 'id="time-window-filter"' in html
+    assert 'id="pressure-chart"' in html
+    assert 'id="opportunity-table"' in html
+    assert 'id="message-library"' in html
+    assert 'id="credit-cost-warning"' in html
+    assert "créditos que serão consumidos" in html
+
+
+def test_janelas_criticas_usam_fuso_de_sao_paulo() -> None:
+    # Segunda-feira 14h em São Paulo.
+    assert _corresponde_janela_horaria(
+        datetime(2026, 7, 20, 17, 0, tzinfo=timezone.utc), "commercial"
+    )
+    # Domingo 02h em São Paulo pertence à noite de blitz iniciada no sábado.
+    assert _corresponde_janela_horaria(
+        datetime(2026, 7, 19, 5, 0, tzinfo=timezone.utc), "blitz"
+    )
+    assert not _corresponde_janela_horaria(
+        datetime(2026, 7, 20, 17, 0, tzinfo=timezone.utc), "blitz"
+    )
 
 
 def test_plano_economico_nao_executa_e_calcula_creditos() -> None:

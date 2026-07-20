@@ -5,6 +5,7 @@ from datetime import datetime, time, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,6 +26,17 @@ LEGACY_SERVICE_LABELS = {
     "suspensao": ("Suspensão da CNH", "Suspensao da CNH"),
     "cassacao": ("Cassação da CNH", "Cassacao da CNH"),
     "ppd": ("Permissão para Dirigir", "Permissão para Dirigir (PPD)"),
+}
+
+try:
+    SAO_PAULO_TZ = ZoneInfo("America/Sao_Paulo")
+except ZoneInfoNotFoundError:
+    # Fallback para runtimes Windows mínimos sem base IANA; a VPS Linux usa ZoneInfo.
+    SAO_PAULO_TZ = timezone(timedelta(hours=-3), name="America/Sao_Paulo")
+TIME_WINDOW_LABELS = {
+    "all": "Todos os horários",
+    "commercial": "Comercial · seg–sex, 09h–18h",
+    "blitz": "Madrugada de blitz · qui–dom, 22h–05h",
 }
 
 
@@ -112,6 +124,22 @@ def _consulta_da_busca(busca: SearchRun) -> str:
 def _inicio_janela(days: int, agora: datetime) -> datetime:
     data_inicial = agora.date() - timedelta(days=days - 1)
     return datetime.combine(data_inicial, time.min, tzinfo=timezone.utc)
+
+
+def _corresponde_janela_horaria(instante: datetime, janela: str) -> bool:
+    if janela == "all":
+        return True
+    local = instante.astimezone(SAO_PAULO_TZ)
+    dia = local.weekday()  # segunda=0, domingo=6
+    hora = local.hour
+    if janela == "commercial":
+        return dia <= 4 and 9 <= hora < 18
+    if janela == "blitz":
+        # Noites iniciadas entre quinta e domingo; 00h–05h pertence à noite anterior.
+        return (dia in {3, 4, 5, 6} and hora >= 22) or (
+            hora < 5 and ((dia - 1) % 7) in {3, 4, 5, 6}
+        )
+    raise ValueError("time_window deve ser all, commercial ou blitz.")
 
 
 def _condicoes_busca(
@@ -280,11 +308,14 @@ async def construir_dashboard(
     service: str | None = None,
     location: str | None = None,
     device: str | None = None,
+    time_window: str = "all",
 ) -> dict:
     if days not in {7, 30, 90}:
         raise ValueError("days deve ser 7, 30 ou 90.")
     if device and device.lower() not in {"mobile", "desktop"}:
         raise ValueError("device deve ser mobile ou desktop.")
+    if time_window not in TIME_WINDOW_LABELS:
+        raise ValueError("time_window deve ser all, commercial ou blitz.")
 
     agora = datetime.now(timezone.utc)
     inicio = _inicio_janela(days, agora)
@@ -314,6 +345,14 @@ async def construir_dashboard(
         .order_by(AdObservation.observed_at.desc(), AdObservation.id.desc())
     )
     linhas = list(resultado_observacoes.all())
+
+    buscas = [
+        busca
+        for busca in buscas
+        if _corresponde_janela_horaria(busca.requested_at, time_window)
+    ]
+    ids_buscas_filtradas = {busca.id for busca in buscas}
+    linhas = [linha for linha in linhas if linha[3].id in ids_buscas_filtradas]
 
     ids_buscas_concluidas = {busca.id for busca in buscas if busca.status == "completed"}
     assinaturas = {_assinatura_anuncio(linha[0]) for linha in linhas}
@@ -345,6 +384,8 @@ async def construir_dashboard(
                     "queries": set(),
                     "locations": set(),
                     "devices": set(),
+                    "positions": [],
+                    "top_one_runs": set(),
                     "first_observed_at": observacao.observed_at,
                     "last_observed_at": observacao.observed_at,
                 }
@@ -355,6 +396,10 @@ async def construir_dashboard(
         item["queries"].add(_consulta_da_busca(busca))
         item["locations"].add(busca.region_name)
         item["devices"].add(busca.device)
+        if observacao.position_index:
+            item["positions"].append(observacao.position_index)
+            if observacao.position_index == 1:
+                item["top_one_runs"].add(busca.id)
         if pagina is not None:
             item["landing_pages"].add(pagina.id)
         item["first_observed_at"] = min(
@@ -385,6 +430,12 @@ async def construir_dashboard(
                 "queries_observed": len(item["queries"]),
                 "regions_observed": len(item["locations"]),
                 "devices_observed": sorted(item["devices"]),
+                "average_position_observed": round(
+                    sum(item["positions"]) / len(item["positions"]), 2
+                )
+                if item["positions"]
+                else None,
+                "top_one_search_runs": len(item["top_one_runs"]),
                 "locations": sorted(item["locations"], key=str.casefold),
                 "first_observed_at": item["first_observed_at"],
                 "last_observed_at": item["last_observed_at"],
@@ -392,7 +443,8 @@ async def construir_dashboard(
         )
     advertiser_ranking.sort(
         key=lambda item: (
-            -item["observations"],
+            -item["observed_presence_rate"],
+            -item["top_one_search_runs"],
             -item["unique_ads_observed"],
             item["advertiser"].casefold(),
         )
@@ -460,6 +512,77 @@ async def construir_dashboard(
         )
     )
 
+    anunciantes_por_busca: dict[int, set[int]] = defaultdict(set)
+    for _, anunciante, _, busca in linhas:
+        anunciantes_por_busca[busca.id].add(anunciante.id)
+
+    oportunidades_agrupadas: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for busca in buscas:
+        if busca.status != "completed":
+            continue
+        chave = (
+            _normalizar_texto(_consulta_da_busca(busca)),
+            _normalizar_texto(busca.region_name),
+            busca.device,
+        )
+        item = oportunidades_agrupadas.setdefault(
+            chave,
+            {
+                "query": _consulta_da_busca(busca),
+                "location": busca.region_name,
+                "device": busca.device,
+                "runs": 0,
+                "zero_runs": 0,
+                "competitor_counts": [],
+                "last_searched_at": busca.requested_at,
+            },
+        )
+        concorrentes_na_busca = len(anunciantes_por_busca.get(busca.id, set()))
+        item["runs"] += 1
+        item["competitor_counts"].append(concorrentes_na_busca)
+        if concorrentes_na_busca == 0:
+            item["zero_runs"] += 1
+        item["last_searched_at"] = max(
+            item["last_searched_at"], busca.requested_at
+        )
+
+    opportunity_map: list[dict[str, Any]] = []
+    for item in oportunidades_agrupadas.values():
+        media = sum(item["competitor_counts"]) / item["runs"]
+        if media == 0:
+            classificacao = "sem_anuncios_observados"
+        elif media < 2:
+            classificacao = "oceano_azul_potencial"
+        elif media <= 2:
+            classificacao = "baixa_pressao"
+        else:
+            classificacao = "concorrida"
+        confianca = "alta" if item["runs"] >= 8 else "media" if item["runs"] >= 3 else "baixa"
+        opportunity_map.append(
+            {
+                "query": item["query"],
+                "location": item["location"],
+                "device": item["device"],
+                "completed_runs": item["runs"],
+                "zero_ad_runs": item["zero_runs"],
+                "zero_ad_rate": round(100 * item["zero_runs"] / item["runs"], 1),
+                "average_distinct_advertisers": round(media, 2),
+                "max_distinct_advertisers": max(item["competitor_counts"], default=0),
+                "classification": classificacao,
+                "is_opportunity": media < 2,
+                "sample_confidence": confianca,
+                "last_searched_at": item["last_searched_at"],
+            }
+        )
+    opportunity_map.sort(
+        key=lambda item: (
+            not item["is_opportunity"],
+            item["average_distinct_advertisers"],
+            -item["completed_runs"],
+            item["query"].casefold(),
+        )
+    )
+
     timeline_map: dict[str, dict[str, Any]] = {}
     for deslocamento in range(days):
         data = (inicio.date() + timedelta(days=deslocamento)).isoformat()
@@ -502,9 +625,7 @@ async def construir_dashboard(
     ]
 
     recentes = linhas[:100]
-    landing_page_ids = {
-        pagina.id for _, _, pagina, _ in recentes if pagina is not None
-    }
+    landing_page_ids = {pagina.id for _, _, pagina, _ in linhas if pagina is not None}
     snapshots = await _ultimos_snapshots(session, landing_page_ids)
     recent_observations = [
         _observacao_json(
@@ -514,12 +635,76 @@ async def construir_dashboard(
         for linha in recentes
     ]
 
+    mensagens_por_anunciante: dict[int, dict[str, Any]] = {}
+    for observacao, anunciante, pagina, _ in linhas:
+        item = mensagens_por_anunciante.setdefault(
+            anunciante.id,
+            {
+                "advertiser_id": anunciante.id,
+                "advertiser": anunciante.display_name or anunciante.domain,
+                "domain": anunciante.domain,
+                "titles": set(),
+                "descriptions": set(),
+                "headlines": set(),
+                "subtitles": set(),
+                "ctas": set(),
+                "whatsapp_links": set(),
+                "urgency_signals": set(),
+                "authority_signals": set(),
+                "social_proof": set(),
+                "landing_pages": set(),
+            },
+        )
+        if observacao.title:
+            item["titles"].add(observacao.title.strip())
+        if observacao.description:
+            item["descriptions"].add(observacao.description.strip())
+        if pagina is None:
+            continue
+        item["landing_pages"].add(pagina.canonical_url)
+        snapshot = snapshots.get(pagina.id)
+        if snapshot is None:
+            continue
+        if snapshot.h1:
+            item["headlines"].add(snapshot.h1.strip())
+        item["subtitles"].update(texto.strip() for texto in (snapshot.h2 or []) if texto.strip())
+        if snapshot.primary_cta:
+            item["ctas"].add(snapshot.primary_cta.strip())
+        item["whatsapp_links"].update(snapshot.whatsapp_links or [])
+        for campo in ("urgency_signals", "authority_signals", "social_proof"):
+            for sinal in getattr(snapshot, campo) or []:
+                if isinstance(sinal, dict):
+                    texto = sinal.get("evidence") or sinal.get("type")
+                else:
+                    texto = str(sinal)
+                if texto:
+                    item[campo].add(str(texto).strip())
+
+    messaging_library = []
+    for item in mensagens_por_anunciante.values():
+        messaging_library.append(
+            {
+                chave: sorted(valor, key=str.casefold) if isinstance(valor, set) else valor
+                for chave, valor in item.items()
+            }
+        )
+    messaging_library.sort(
+        key=lambda item: (
+            -(len(item["titles"]) + len(item["headlines"]) + len(item["ctas"])),
+            item["advertiser"].casefold(),
+        )
+    )
+
     coverage = {
         "period_days": days,
         "window_start": inicio,
         "window_end": agora,
         "search_runs": len(buscas),
         "completed_search_runs": total_buscas_concluidas,
+        "zero_ad_search_runs": sum(
+            busca.status == "completed" and not anunciantes_por_busca.get(busca.id)
+            for busca in buscas
+        ),
         "failed_search_runs": sum(busca.status == "failed" for busca in buscas),
         "pending_search_runs": sum(busca.status == "pending" for busca in buscas),
         "search_runs_with_observations": len(ids_buscas_observadas),
@@ -543,7 +728,13 @@ async def construir_dashboard(
                 item.strip() for item in (location or "").split(",") if item.strip()
             ],
             "device": device,
+            "time_window": time_window,
+            "time_window_label": TIME_WINDOW_LABELS[time_window],
         },
+        "sample_confidence": (
+            "alta" if total_buscas_concluidas >= 20 else
+            "media" if total_buscas_concluidas >= 8 else "baixa"
+        ),
     }
 
     executive_summary: list[dict[str, str]] = []
@@ -600,7 +791,10 @@ async def construir_dashboard(
         "coverage": coverage,
         "executive_summary": executive_summary,
         "advertiser_ranking": advertiser_ranking,
+        "market_pressure": advertiser_ranking,
         "query_ranking": query_ranking,
+        "opportunity_map": opportunity_map,
+        "messaging_library": messaging_library,
         "timeline": timeline,
         "recent_observations": recent_observations,
         "methodology": {
@@ -620,6 +814,19 @@ async def construir_dashboard(
                 "Presença observada é a proporção de buscas concluídas em que o "
                 "anunciante apareceu; não é participação de mercado nem impression share."
             ),
+            "time_window": (
+                "As janelas horárias são calculadas no fuso America/Sao_Paulo. "
+                "Comercial cobre seg–sex, 09h–18h; blitz cobre noites iniciadas "
+                "de quinta a domingo, 22h–05h."
+            ),
+            "opportunity": (
+                "Oportunidade significa baixa concorrência observada na amostra; "
+                "não comprova CPC menor, ausência permanente de anunciantes ou resultado futuro."
+            ),
+            "messages": (
+                "Mensagens e CTAs são textos observados; o Radar não possui dados de "
+                "conversão dos concorrentes e não os classifica como vencedores."
+            ),
             "queries": (
                 "O ranking de consultas mostra termos pesquisados pelo Radar e não "
                 "revela as palavras-chave compradas pelo concorrente."
@@ -634,4 +841,8 @@ async def construir_dashboard(
             },
         },
         "filter_options": await _opcoes_filtro(session),
+        "time_window_options": [
+            {"value": chave, "label": rotulo}
+            for chave, rotulo in TIME_WINDOW_LABELS.items()
+        ],
     }

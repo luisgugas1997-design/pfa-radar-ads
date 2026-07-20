@@ -104,7 +104,7 @@
     .segmented { display: inline-flex; padding: 3px; border-radius: 11px; background: var(--slate-100); }
     .segment { border: 0; border-radius: 8px; padding: 7px 13px; color: var(--slate-500); background: transparent; cursor: pointer; font-size: 12px; font-weight: 800; }
     .segment.active { color: var(--blue-700); background: #fff; box-shadow: 0 2px 8px rgba(15,23,42,.08); }
-    .filters { display: grid; grid-template-columns: 1.1fr 1.4fr .8fr 1.35fr; gap: 14px; align-items: start; }
+    .filters { display: grid; grid-template-columns: 1.05fr 1.35fr .75fr 1fr 1.25fr; gap: 12px; align-items: start; }
     .control { width: 100%; min-height: 45px; border: 1px solid var(--slate-300); border-radius: 11px; padding: 0 12px; color: var(--slate-950); background: #fff; }
     .control:hover { border-color: #94a3b8; }
     .region-select { position: relative; }
@@ -204,6 +204,28 @@
     .metric-mini b { display: block; font-size: 12px; }
     .metric-mini small { display: block; color: var(--slate-400); font-size: 8px; text-transform: uppercase; }
     .rank-actions { display: flex; gap: 5px; }
+
+    .pressure-list { display: grid; gap: 11px; }
+    .pressure-row { display: grid; grid-template-columns: minmax(150px, .9fr) minmax(180px, 1.5fr) auto; gap: 12px; align-items: center; }
+    .pressure-name strong { display: block; font-size: 12px; }
+    .pressure-name span { color: var(--slate-500); font-size: 9px; }
+    .pressure-track { height: 12px; overflow: hidden; border-radius: 999px; background: var(--slate-100); }
+    .pressure-track span { display: block; height: 100%; min-width: 3px; border-radius: inherit; background: linear-gradient(90deg, #1d4ed8, #60a5fa); }
+    .pressure-value { min-width: 56px; text-align: right; font-size: 12px; font-weight: 900; }
+    .table-wrap { overflow: auto; border: 1px solid var(--slate-200); border-radius: 13px; }
+    .market-table { width: 100%; border-collapse: collapse; background: #fff; font-size: 10px; }
+    .market-table th, .market-table td { padding: 10px 11px; border-bottom: 1px solid var(--slate-100); text-align: left; white-space: nowrap; }
+    .market-table th { position: sticky; top: 0; color: var(--slate-500); background: var(--slate-50); font-size: 8px; letter-spacing: .06em; text-transform: uppercase; }
+    .market-table tr:last-child td { border-bottom: 0; }
+    .message-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .message-card { padding: 16px; border: 1px solid var(--slate-200); border-radius: 14px; background: #fff; }
+    .message-card h4 { margin-bottom: 3px; font-size: 14px; }
+    .message-card > small { display: block; margin-bottom: 12px; color: var(--slate-500); }
+    .message-block { margin-top: 10px; }
+    .message-block b { display: block; margin-bottom: 5px; color: var(--slate-500); font-size: 8px; letter-spacing: .08em; text-transform: uppercase; }
+    .message-block ul { margin: 0; padding-left: 17px; color: var(--slate-700); font-size: 10px; }
+    .export-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .cost-warning { margin: 12px 0 0; padding: 12px 14px; border: 1px solid #fde68a; border-radius: 12px; color: #92400e; background: #fffbeb; font-size: 11px; }
 
     .evidence-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
     .evidence-card { display: flex; flex-direction: column; min-height: 290px; overflow: hidden; }
@@ -360,6 +382,9 @@
       .profile-row { grid-template-columns: 1fr 1fr; gap: 7px 10px; }
       .profile-row > :first-child { grid-column: 1 / -1; }
       .profile-row-label { display: block; }
+      .pressure-row { grid-template-columns: 1fr auto; }
+      .pressure-track { grid-column: 1 / -1; grid-row: 2; }
+      .message-grid { grid-template-columns: 1fr; }
       .history-row { grid-template-columns: 80px 1fr; }
       .history-row > :last-child { grid-column: 2; }
       .history-landing-main { align-items: flex-start; flex-direction: column; }
@@ -393,6 +418,8 @@
     <nav class="nav-list">
       <a class="nav-link active" href="#visao-geral"><i class="fa-solid fa-gauge-high"></i>Visão de mercado</a>
       <a class="nav-link" href="#concorrentes"><i class="fa-solid fa-building"></i>Concorrentes</a>
+      <a class="nav-link" href="#oportunidades"><i class="fa-solid fa-water"></i>Oportunidades</a>
+      <a class="nav-link" href="#mensagens"><i class="fa-solid fa-comments-dollar"></i>Mensagens e CTAs</a>
       <a class="nav-link" href="#consultas"><i class="fa-solid fa-magnifying-glass-chart"></i>Consultas observadas</a>
       <a class="nav-link" href="#evidencias"><i class="fa-solid fa-rectangle-ad"></i>Evidências</a>
       <a class="nav-link" href="#landing-pages"><i class="fa-regular fa-window-maximize"></i>Landing pages</a>
@@ -488,6 +515,15 @@
               </select>
             </label>
 
+            <label>
+              <span class="field-label">Janela crítica</span>
+              <select id="time-window-filter" class="control">
+                <option value="all">Todos os horários</option>
+                <option value="commercial">Comercial · seg–sex, 09h–18h</option>
+                <option value="blitz">Madrugada de blitz · qui–dom, 22h–05h</option>
+              </select>
+            </label>
+
             <fieldset style="border:0;padding:0;margin:0">
               <legend class="field-label">Profundidade</legend>
               <div class="mode-options">
@@ -549,6 +585,38 @@
           </article>
         </section>
 
+        <section class="section overview-grid" aria-labelledby="pressure-title">
+          <article class="card panel">
+            <div class="panel-title"><h3 id="pressure-title">Pressão de mercado observada</h3><span class="tag derived">Presença na amostra</span></div>
+            <div id="pressure-chart" class="pressure-list"></div>
+          </article>
+          <article class="card panel">
+            <div class="panel-title"><h3>Como interpretar</h3><span class="tag warning">Não é impression share</span></div>
+            <div class="profile-caveat"><i class="fa-solid fa-chart-simple"></i><span>Percentual de buscas concluídas em que cada concorrente apareceu. O cálculo muda com período, cidade, dispositivo e janela crítica.</span></div>
+            <div id="pressure-context" class="insight-list"></div>
+          </article>
+        </section>
+
+        <section id="oportunidades" class="section" aria-labelledby="opportunity-title">
+          <div class="section-heading">
+            <div><h2 id="opportunity-title">Mapa de oportunidades observadas</h2><p>Consultas sem anúncios ou com menos de dois concorrentes distintos em média.</p></div>
+            <div class="export-actions">
+              <button id="export-opportunities" class="button secondary" type="button"><i class="fa-solid fa-file-csv"></i>Exportar oportunidades</button>
+              <button id="export-competitive" class="button secondary" type="button"><i class="fa-solid fa-file-csv"></i>Exportar concorridos</button>
+            </div>
+          </div>
+          <div id="opportunity-table" class="table-wrap"></div>
+          <div class="source-line" style="margin-top:9px"><span>Oportunidade é um sinal da amostra e não uma promessa de CPC menor.</span></div>
+        </section>
+
+        <section id="mensagens" class="section" aria-labelledby="messages-title">
+          <div class="section-heading">
+            <div><h2 id="messages-title">Biblioteca de mensagens e CTAs</h2><p>Argumentos observados em anúncios e landing pages, agrupados por concorrente.</p></div>
+            <button id="export-messages" class="button secondary" type="button"><i class="fa-solid fa-file-csv"></i>Exportar mensagens</button>
+          </div>
+          <div id="message-library" class="message-grid"></div>
+        </section>
+
         <section id="evidencias" class="section">
           <div class="section-heading">
             <div><h2>Evidências recentes</h2><p>Anúncios observados nas varreduras — esta amostra não representa o inventário completo do anunciante.</p></div>
@@ -575,11 +643,12 @@
 
   <dialog id="confirm-dialog" aria-labelledby="dialog-title">
     <div class="dialog-head">
-      <div><h2 id="dialog-title">Confirmar varredura</h2><p>Confira o consumo estimado antes de iniciar. As pesquisas serão executadas uma por vez.</p></div>
+      <div><h2 id="dialog-title">Confirmar consumo de créditos</h2><p>Nenhuma consulta será executada até sua confirmação. Cada combinação consome aproximadamente um crédito.</p></div>
       <button id="dialog-close" class="icon-button" type="button" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="dialog-body">
       <div id="dialog-summary" class="dialog-summary"></div>
+      <div id="credit-cost-warning" class="cost-warning"></div>
       <div id="dialog-warning" class="status info" hidden></div>
       <ol id="dialog-plan" class="plan-list"></ol>
     </div>
@@ -625,7 +694,7 @@
     };
 
     const state = {
-      filters: { period: 30, service: "Lei Seca", regions: ["São Bernardo do Campo"], device: "mobile", mode: "economico" },
+      filters: { period: 30, service: "Lei Seca", regions: ["São Bernardo do Campo"], device: "mobile", timeWindow: "all", mode: "economico" },
       quota: null,
       plan: null,
       dashboard: null,
@@ -768,6 +837,7 @@
       state.filters.service = $("#service-filter").value;
       state.filters.regions = selectedRegions();
       state.filters.device = $("#device-filter").value;
+      state.filters.timeWindow = $("#time-window-filter").value;
       state.filters.mode = $("input[name='scan-mode']:checked").value;
       const count = state.filters.regions.length;
       $("#region-label").textContent = count === 0
@@ -793,6 +863,7 @@
       });
       if (filters.regions.length) params.set("location", filters.regions.join(","));
       if (filters.device !== "both") params.set("device", filters.device);
+      params.set("time_window", filters.timeWindow || "all");
       return params.toString();
     }
 
@@ -1019,6 +1090,8 @@
         trend,
         observations: filtered.sort((a, b) => new Date(b.observedAt || 0) - new Date(a.observedAt || 0)),
         landingPages: [...landings.values()],
+        opportunities: [],
+        messages: [],
         meta: {
           source: "Banco Radar · /api/radar/observations",
           generatedAt: new Date().toISOString(),
@@ -1036,6 +1109,8 @@
       const queriesRaw = firstArray(raw.query_ranking, raw.queries, raw.keywords, raw.rankings?.queries);
       const observations = firstArray(raw.recent_observations, raw.observations, raw.evidence, raw.ads).map(normalizeObservation);
       const landingsRaw = firstArray(raw.landing_pages, raw.landings, raw.recent_landings);
+      const opportunitiesRaw = firstArray(raw.opportunity_map, raw.opportunities);
+      const messagesRaw = firstArray(raw.messaging_library, raw.messages);
       const landingPages = landingsRaw.length
         ? landingsRaw.map((item) => ({ ...normalizeObservation(item), ...item }))
         : [...new Map(observations.filter((item) => item.targetUrl).map((item) => [item.targetUrl, item])).values()];
@@ -1059,6 +1134,8 @@
           queries: firstNumber(item.search_runs_with_presence, item.queries_observed, item.queries, item.search_terms),
           regions: firstNumber(item.regions_observed, item.regions, item.cities),
           presenceRate: firstNumber(item.observed_presence_rate),
+          averagePosition: firstNullableNumber(item.average_position_observed),
+          topOneRuns: firstNumber(item.top_one_search_runs),
           landingPages: firstNumber(item.landing_pages_observed),
           firstSeen: item.first_observed_at || item.first_seen,
           lastSeen: item.last_seen || item.last_observed_at || item.observed_at,
@@ -1075,6 +1152,35 @@
         trend: firstArray(raw.trend, raw.timeline, raw.series, raw.appearances_over_time).map((item) => ({ date: item.date || item.day || item.period || item.label, value: firstNumber(item.value, item.appearances, item.observations, item.count) })),
         observations,
         landingPages,
+        opportunities: opportunitiesRaw.map((item) => ({
+          query: item.query || item.keyword || "Consulta não informada",
+          location: item.location || item.region || "Região não informada",
+          device: item.device || "",
+          completedRuns: firstNumber(item.completed_runs, item.search_runs),
+          zeroRuns: firstNumber(item.zero_ad_runs, item.zero_runs),
+          zeroRate: firstNumber(item.zero_ad_rate),
+          averageAdvertisers: firstNumber(item.average_distinct_advertisers, item.average_advertisers),
+          maxAdvertisers: firstNumber(item.max_distinct_advertisers, item.max_advertisers),
+          classification: item.classification || "inconclusiva",
+          isOpportunity: Boolean(item.is_opportunity),
+          confidence: item.sample_confidence || "baixa",
+          lastSearchedAt: item.last_searched_at,
+        })),
+        messages: messagesRaw.map((item) => ({
+          advertiserId: firstDefined(item.advertiser_id, item.id),
+          advertiser: item.advertiser || item.name || item.domain || "Concorrente observado",
+          domain: item.domain || "",
+          titles: firstArray(item.titles),
+          descriptions: firstArray(item.descriptions),
+          headlines: firstArray(item.headlines),
+          subtitles: firstArray(item.subtitles),
+          ctas: firstArray(item.ctas),
+          whatsappLinks: firstArray(item.whatsapp_links),
+          urgencySignals: firstArray(item.urgency_signals),
+          authoritySignals: firstArray(item.authority_signals),
+          socialProof: firstArray(item.social_proof),
+          landingPages: firstArray(item.landing_pages),
+        })),
         meta: {
           source: raw.meta?.source || raw.source || "Banco PostgreSQL · Radar PFA",
           generatedAt: raw.meta?.generated_at || raw.generated_at || raw.updated_at || new Date().toISOString(),
@@ -1084,10 +1190,14 @@
           methodology: firstObject(raw.methodology),
           coverage: {
             completed: firstNumber(metrics.completed_search_runs),
+            zeroAds: firstNumber(metrics.zero_ad_search_runs),
             failed: firstNumber(metrics.failed_search_runs),
             queries: firstNumber(metrics.queries_searched),
             locations: firstNumber(metrics.locations_searched),
             devices: firstNumber(metrics.devices_searched),
+            timeWindow: metrics.filters?.time_window || "all",
+            timeWindowLabel: metrics.filters?.time_window_label || "Todos os horários",
+            sampleConfidence: metrics.sample_confidence || "baixa",
           },
         },
       };
@@ -1627,6 +1737,57 @@
       }, { once: true }));
     }
 
+    function renderMarketIntelligence(data) {
+      const competitors = data.competitors.slice(0, 10);
+      $("#pressure-chart").innerHTML = competitors.length
+        ? competitors.map((item) => `<div class="pressure-row"><div class="pressure-name"><strong>${escapeHtml(item.name)}</strong><span>${formatNumber(item.queries)} buscas com presença${item.averagePosition ? ` · posição média ${escapeHtml(item.averagePosition)}` : ""}</span></div><div class="pressure-track" role="img" aria-label="${escapeHtml(item.name)}: ${formatNumber(item.presenceRate)} por cento"><span style="width:${Math.max(0, Math.min(100, item.presenceRate))}%"></span></div><div class="pressure-value">${formatNumber(item.presenceRate)}%</div></div>`).join("")
+        : '<div class="empty">Nenhuma presença concorrente observada neste recorte.</div>';
+      const coverage = data.meta.coverage || {};
+      $("#pressure-context").innerHTML = [
+        `${formatNumber(coverage.completed)} buscas concluídas compõem o denominador.`,
+        `${formatNumber(coverage.zeroAds)} buscas não retornaram concorrentes observados.`,
+        `Janela: ${coverage.timeWindowLabel || "Todos os horários"}. Confiança: ${coverage.sampleConfidence || "baixa"}.`,
+      ].map((text, index) => `<div class="insight"><span class="insight-number">${index + 1}</span><p>${escapeHtml(text)}</p></div>`).join("");
+
+      const opportunities = data.opportunities || [];
+      $("#opportunity-table").innerHTML = opportunities.length ? `<table class="market-table"><thead><tr><th>Consulta</th><th>Cidade</th><th>Dispositivo</th><th>Buscas</th><th>Sem anúncios</th><th>Concorrentes médios</th><th>Sinal</th><th>Confiança</th></tr></thead><tbody>${opportunities.map((item) => `<tr><td><strong>${escapeHtml(item.query)}</strong></td><td>${escapeHtml(item.location)}</td><td>${escapeHtml(item.device)}</td><td>${formatNumber(item.completedRuns)}</td><td>${formatNumber(item.zeroRuns)} (${formatNumber(item.zeroRate)}%)</td><td>${escapeHtml(item.averageAdvertisers)}</td><td><span class="tag ${item.isOpportunity ? "collected" : item.classification === "baixa_pressao" ? "warning" : "derived"}">${escapeHtml(item.classification.replaceAll("_", " "))}</span></td><td>${escapeHtml(item.confidence)}</td></tr>`).join("")}</tbody></table>` : '<div class="empty">Ainda não há buscas concluídas suficientes para mapear oportunidades.</div>';
+
+      const library = data.messages || [];
+      const list = (items, limit = 4) => items.slice(0, limit).map((text) => `<li>${escapeHtml(text)}</li>`).join("");
+      $("#message-library").innerHTML = library.length ? library.slice(0, 12).map((item) => `<article class="message-card"><h4>${escapeHtml(item.advertiser)}</h4><small>${escapeHtml(item.domain)}</small>${item.titles.length ? `<div class="message-block"><b>Títulos observados</b><ul>${list(item.titles)}</ul></div>` : ""}${item.headlines.length ? `<div class="message-block"><b>Headlines das páginas</b><ul>${list(item.headlines)}</ul></div>` : ""}${item.ctas.length ? `<div class="message-block"><b>CTAs</b><ul>${list(item.ctas)}</ul></div>` : ""}<div class="chips">${item.whatsappLinks.length ? '<span class="chip">WhatsApp observado</span>' : ""}${item.urgencySignals.map((text) => `<span class="chip">Urgência: ${escapeHtml(text)}</span>`).join("")}${item.authoritySignals.map((text) => `<span class="chip">Autoridade: ${escapeHtml(text)}</span>`).join("")}</div>${advertiserProfileButton({ advertiserId: item.advertiserId, name: item.advertiser, domain: item.domain }, "Abrir perfil completo")}</article>`).join("") : '<div class="empty">Nenhuma mensagem de landing page disponível neste recorte.</div>';
+    }
+
+    function downloadCsv(filename, rows) {
+      if (!rows.length) return showStatus("Não há dados neste recorte para exportar.", "info");
+      const columns = [...new Set(rows.flatMap((row) => Object.keys(row)))];
+      const escapeCsv = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`;
+      const csv = "\ufeff" + [columns, ...rows.map((row) => columns.map((column) => row[column]))].map((row) => row.map(escapeCsv).join(";")).join("\r\n");
+      const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+      const link = document.createElement("a");
+      link.href = url; link.download = filename; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+    }
+
+    function exportTerms(opportunitiesOnly) {
+      const rows = (state.dashboard?.opportunities || []).filter((item) => opportunitiesOnly ? item.isOpportunity : !item.isOpportunity).map((item) => ({
+        servico: state.filters.service, consulta: item.query, cidade: item.location, dispositivo: item.device,
+        janela: state.dashboard?.meta?.coverage?.timeWindowLabel || state.filters.timeWindow,
+        buscas_concluidas: item.completedRuns, buscas_sem_anuncios: item.zeroRuns, taxa_sem_anuncios: item.zeroRate,
+        concorrentes_distintos_medios: item.averageAdvertisers, maximo_concorrentes: item.maxAdvertisers,
+        classificacao: item.classification, confianca_amostra: item.confidence, ultima_busca: item.lastSearchedAt,
+      }));
+      downloadCsv(opportunitiesOnly ? "radar-oportunidades.csv" : "radar-termos-concorridos.csv", rows);
+    }
+
+    function exportMessages() {
+      const rows = (state.dashboard?.messages || []).map((item) => ({
+        anunciante: item.advertiser, dominio: item.domain, titulos: item.titles.join(" | "), descricoes: item.descriptions.join(" | "),
+        headlines: item.headlines.join(" | "), subtitulos: item.subtitles.join(" | "), ctas: item.ctas.join(" | "),
+        whatsapp_observado: item.whatsappLinks.length ? "sim" : "não", sinais_urgencia: item.urgencySignals.join(" | "),
+        sinais_autoridade: item.authoritySignals.join(" | "), prova_social: item.socialProof.join(" | "), landing_pages: item.landingPages.join(" | "),
+      }));
+      downloadCsv("radar-mensagens-ctas.csv", rows);
+    }
+
     function renderDashboard(data) {
       state.dashboard = data;
       renderKpis(data);
@@ -1635,11 +1796,12 @@
       renderRankings(data);
       renderEvidence(data);
       renderLandings(data);
+      renderMarketIntelligence(data);
       $("#dashboard-content").setAttribute("aria-busy", "false");
       $("#dashboard-source").innerHTML = `<i class="fa-solid fa-database"></i><span>${escapeHtml(data.meta.source)}</span><span>·</span><span>Painel atualizado ${escapeHtml(formatDate(data.meta.generatedAt, true))}</span><span>·</span><span class="confidence">Confiança ${escapeHtml(data.meta.confidence)}</span>`;
       const coverage = data.meta.coverage;
       $("#coverage-strip").innerHTML = coverage
-        ? `<span class="tag collected">Dado coletado</span><span><b>${formatNumber(coverage.completed)}</b> buscas concluídas</span><span><b>${formatNumber(coverage.failed)}</b> falhas</span><span><b>${formatNumber(coverage.queries)}</b> consultas</span><span><b>${formatNumber(coverage.locations)}</b> regiões</span><span><b>${formatNumber(coverage.devices)}</b> dispositivos</span>`
+        ? `<span class="tag collected">Dado coletado</span><span><b>${formatNumber(coverage.completed)}</b> buscas concluídas</span><span><b>${formatNumber(coverage.zeroAds)}</b> sem anúncios</span><span><b>${formatNumber(coverage.failed)}</b> falhas</span><span><b>${formatNumber(coverage.queries)}</b> consultas</span><span><b>${formatNumber(coverage.locations)}</b> regiões</span><span><b>${formatNumber(coverage.devices)}</b> dispositivos</span><span><b>${escapeHtml(coverage.timeWindowLabel || "Todos os horários")}</b></span>`
         : '<span class="tag collected">Dado coletado</span><span>Cobertura detalhada indisponível no modo de contingência.</span>';
       const freshness = $("#freshness-badge");
       freshness.className = "pill";
@@ -1662,6 +1824,10 @@
       $("#trend-chart").innerHTML = '<div class="loading-state" style="width:100%"><i class="fa-solid fa-circle-notch fa-spin"></i>Carregando tendência…</div>';
       $("#competitor-ranking").innerHTML = '<li class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Carregando concorrentes…</li>';
       $("#query-ranking").innerHTML = '<li class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Carregando consultas…</li>';
+      $("#pressure-chart").innerHTML = '<div class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Calculando pressão…</div>';
+      $("#pressure-context").innerHTML = "";
+      $("#opportunity-table").innerHTML = '<div class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Mapeando oportunidades…</div>';
+      $("#message-library").innerHTML = '<div class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Agrupando mensagens…</div>';
       $("#evidence-grid").innerHTML = '<div class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Carregando evidências…</div>';
       $("#landing-grid").innerHTML = '<div class="loading-state"><i class="fa-solid fa-circle-notch fa-spin"></i>Carregando landing pages…</div>';
     }
@@ -1669,7 +1835,7 @@
     function renderDashboardError(message) {
       const html = `<div class="error-state"><i class="fa-solid fa-circle-exclamation"></i>${escapeHtml(message)}<br><button class="button secondary" type="button" data-action="retry-dashboard" style="margin-top:12px">Tentar novamente</button></div>`;
       $("#kpi-grid").innerHTML = html;
-      ["#insights-list", "#trend-chart", "#competitor-ranking", "#query-ranking", "#evidence-grid", "#landing-grid"].forEach((selector) => $(selector).innerHTML = "");
+      ["#insights-list", "#trend-chart", "#competitor-ranking", "#query-ranking", "#pressure-chart", "#pressure-context", "#opportunity-table", "#message-library", "#evidence-grid", "#landing-grid"].forEach((selector) => $(selector).innerHTML = "");
       $("#dashboard-source").innerHTML = "";
       $("#coverage-strip").innerHTML = "";
       $("#freshness-badge").innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>Dados indisponíveis</span>';
@@ -1701,7 +1867,9 @@
     function openConfirmation() {
       if (!state.plan || !state.plan.searches.length || !state.plan.sufficient || state.scanning) return;
       const plan = state.plan;
-      $("#dialog-summary").innerHTML = `<div class="summary-box"><b>${formatNumber(plan.estimatedSearches)}</b><span>consultas estimadas</span></div><div class="summary-box"><b>${formatNumber(state.filters.regions.length)}</b><span>regiões</span></div><div class="summary-box"><b>${formatNumber(plan.remaining)}</b><span>saldo antes</span></div>`;
+      const balanceAfter = Number.isFinite(Number(plan.remaining)) ? Math.max(0, Number(plan.remaining) - Number(plan.estimatedSearches || 0)) : null;
+      $("#dialog-summary").innerHTML = `<div class="summary-box"><b>${formatNumber(plan.estimatedSearches)}</b><span>créditos que serão consumidos</span></div><div class="summary-box"><b>${formatNumber(state.filters.regions.length)}</b><span>regiões</span></div><div class="summary-box"><b>${plan.remaining == null ? "—" : formatNumber(plan.remaining)}</b><span>saldo antes</span></div><div class="summary-box"><b>${balanceAfter == null ? "—" : formatNumber(balanceAfter)}</b><span>saldo estimado depois</span></div>`;
+      $("#credit-cost-warning").innerHTML = `<b>Atenção:</b> ao confirmar, aproximadamente <b>${formatNumber(plan.estimatedSearches)} créditos</b> serão gastos e não poderão ser recuperados, mesmo quando uma consulta retornar zero anúncios. As buscas serão executadas uma por vez e você poderá interromper após a consulta em andamento.`;
       const warning = $("#dialog-warning");
       warning.hidden = !plan.fallback && !plan.limited;
       if (plan.fallback && plan.limited) warning.textContent = "O endpoint de planejamento não respondeu e o plano foi limitado localmente a 24 consultas. Os termos omitidos estão identificados abaixo.";
@@ -1792,6 +1960,7 @@
     }));
     $("#service-filter").addEventListener("change", scheduleRefresh);
     $("#device-filter").addEventListener("change", scheduleRefresh);
+    $("#time-window-filter").addEventListener("change", scheduleRefresh);
     $$("input[name='scan-mode']").forEach((input) => input.addEventListener("change", scheduleRefresh));
     function handleRegionChange(input) {
       if (!selectedRegions().length) {
@@ -1850,6 +2019,9 @@
       state.advertiserProfile.transparency = { status: "idle", data: null, message: "" };
     });
     $("#confirm-scan").addEventListener("click", executePlan);
+    $("#export-opportunities").addEventListener("click", () => exportTerms(true));
+    $("#export-competitive").addEventListener("click", () => exportTerms(false));
+    $("#export-messages").addEventListener("click", exportMessages);
     $("#cancel-scan").addEventListener("click", () => {
       state.cancelRequested = true;
       $("#cancel-scan").disabled = true;
