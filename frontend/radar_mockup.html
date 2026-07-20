@@ -109,6 +109,7 @@
     .control:hover { border-color: #94a3b8; }
     .region-select { position: relative; }
     .region-select summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 45px; border: 1px solid var(--slate-300); border-radius: 11px; padding: 10px 12px; cursor: pointer; list-style: none; background: #fff; font-size: 13px; }
+    #region-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .region-select summary span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .region-select summary::-webkit-details-marker { display: none; }
     .region-select[open] summary { border-color: var(--blue-600); box-shadow: 0 0 0 3px var(--blue-100); }
@@ -183,7 +184,7 @@
     .insight { display: grid; grid-template-columns: 32px 1fr; gap: 11px; padding: 12px; border: 1px solid var(--slate-200); border-radius: 12px; background: var(--slate-50); }
     .insight-number { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 9px; color: var(--blue-700); background: var(--blue-100); font-size: 11px; font-weight: 900; }
     .insight p { margin-bottom: 7px; color: var(--slate-700); font-size: 12px; }
-    .trend-chart { display: flex; align-items: end; gap: 7px; min-height: 210px; padding: 26px 4px 0; border-bottom: 1px solid var(--slate-200); }
+    .trend-chart { display: flex; align-items: end; gap: 7px; min-width: 0; min-height: 210px; overflow: hidden; padding: 26px 4px 0; border-bottom: 1px solid var(--slate-200); }
     .trend-column { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-end; height: 180px; min-width: 12px; }
     .trend-value { margin-bottom: 4px; color: var(--slate-500); font-size: 9px; font-weight: 700; }
     .trend-bar { width: min(32px, 75%); min-height: 3px; border-radius: 7px 7px 2px 2px; background: linear-gradient(180deg, #3b82f6, #1d4ed8); }
@@ -230,6 +231,71 @@
     .methodology summary { cursor: pointer; color: var(--slate-700); font-size: 12px; font-weight: 850; }
     .methodology-list { display: grid; gap: 8px; margin: 14px 0 0; padding-left: 18px; color: var(--slate-600); font-size: 11px; line-height: 1.55; }
 
+    .profile-dialog {
+      width: min(1120px, calc(100vw - 24px)); height: calc(100vh - 24px); max-height: calc(100vh - 24px);
+      margin: 12px 12px 12px auto; border-radius: 22px; color: var(--slate-950); background: var(--slate-50);
+    }
+    .profile-dialog[open] { display: flex; flex-direction: column; }
+    .profile-head { display: flex; flex: 0 0 auto; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 20px 22px; border-bottom: 1px solid var(--slate-200); background: #fff; }
+    .profile-head-main { min-width: 0; }
+    .profile-head h2 { overflow: hidden; margin: 4px 0 2px; font-size: clamp(21px, 2.4vw, 30px); line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
+    .profile-domain { overflow: hidden; color: var(--slate-500); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+    .profile-head-actions { display: flex; align-items: center; gap: 8px; }
+    .profile-scroll { flex: 1 1 auto; overflow: auto; padding: 20px 22px 34px; }
+    .profile-state { display: grid; min-height: 360px; place-items: center; padding: 30px; text-align: center; }
+    .profile-state > div { max-width: 440px; }
+    .profile-state i { display: block; margin-bottom: 12px; color: var(--blue-600); font-size: 28px; }
+    .profile-state h3 { margin-bottom: 6px; font-size: 17px; }
+    .profile-state p { margin-bottom: 14px; color: var(--slate-500); font-size: 12px; }
+    .profile-caveat { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; padding: 12px 14px; border: 1px solid #c7d2fe; border-radius: 13px; color: #3730a3; background: #eef2ff; font-size: 11px; }
+    .profile-caveat i { margin-top: 2px; }
+    .profile-kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .profile-kpi { min-width: 0; padding: 13px; border: 1px solid var(--slate-200); border-radius: 13px; background: #fff; }
+    .profile-kpi strong { display: block; overflow: hidden; font-size: 19px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+    .profile-kpi span { display: block; margin-top: 4px; color: var(--slate-500); font-size: 9px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .profile-tabs { position: sticky; z-index: 4; top: -20px; display: flex; gap: 5px; overflow-x: auto; margin: 0 -2px 16px; padding: 10px 2px; border-bottom: 1px solid var(--slate-200); background: rgba(248,250,252,.96); scrollbar-width: thin; }
+    .profile-tab { flex: 0 0 auto; min-height: 38px; border: 0; border-radius: 9px; padding: 8px 11px; cursor: pointer; color: var(--slate-600); background: transparent; font-size: 11px; font-weight: 850; }
+    .profile-tab[aria-selected="true"] { color: var(--blue-700); background: var(--blue-100); }
+    .profile-panel { min-width: 0; }
+    .profile-section { margin-bottom: 14px; padding: 17px; border: 1px solid var(--slate-200); border-radius: 15px; background: #fff; }
+    .profile-section:last-child { margin-bottom: 0; }
+    .profile-section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 13px; }
+    .profile-section-head h3 { margin-bottom: 3px; font-size: 15px; }
+    .profile-section-head p { margin-bottom: 0; color: var(--slate-500); font-size: 10px; }
+    .profile-summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+    .profile-summary { padding: 12px; border-radius: 11px; background: var(--slate-50); }
+    .profile-summary strong { display: block; font-size: 16px; }
+    .profile-summary span { color: var(--slate-500); font-size: 9px; text-transform: uppercase; }
+    .profile-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .profile-card { min-width: 0; padding: 14px; border: 1px solid var(--slate-200); border-radius: 12px; background: var(--slate-50); }
+    .profile-card h4 { margin: 8px 0 5px; font-size: 13px; line-height: 1.35; }
+    .profile-card p { margin-bottom: 9px; color: var(--slate-600); font-size: 11px; }
+    .profile-card .source-line { margin-top: 9px; }
+    .profile-rows { display: grid; }
+    .profile-row { display: grid; grid-template-columns: minmax(150px, 1.25fr) repeat(2, minmax(90px, .55fr)) minmax(120px, .7fr); gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--slate-100); font-size: 10px; }
+    .profile-row:last-child { border-bottom: 0; }
+    .profile-row strong { font-size: 11px; }
+    .profile-row-label { display: none; color: var(--slate-400); font-size: 8px; font-weight: 800; text-transform: uppercase; }
+    .profile-history { display: grid; gap: 8px; }
+    .history-row { display: grid; grid-template-columns: 105px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 11px; background: var(--slate-50); font-size: 10px; }
+    .history-bar { height: 8px; overflow: hidden; border-radius: 999px; background: var(--slate-200); }
+    .history-bar span { display: block; height: 100%; min-width: 3px; border-radius: inherit; background: var(--blue-600); }
+    .history-landing { padding: 12px 0; border-bottom: 1px solid var(--slate-100); }
+    .history-landing:last-child { border-bottom: 0; }
+    .history-landing-main { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .history-landing-main > div { min-width: 0; }
+    .history-landing strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+    .snapshot-result { margin-top: 9px; }
+    .snapshot-item { display: grid; grid-template-columns: 120px 90px 1fr; gap: 8px; padding: 8px 10px; border-radius: 9px; background: var(--slate-50); font-size: 9px; }
+    .transparency-center { border-color: #bfdbfe; background: linear-gradient(135deg, #fff, #eff6ff); }
+    .transparency-cost { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+    .transparency-cost div { padding: 11px; border: 1px solid #bfdbfe; border-radius: 11px; background: rgba(255,255,255,.78); }
+    .transparency-cost strong { display: block; color: var(--blue-700); font-size: 15px; }
+    .transparency-cost span { color: var(--slate-500); font-size: 9px; text-transform: uppercase; }
+    .transparency-image { width: 100%; max-height: 210px; margin-bottom: 10px; border: 1px solid var(--slate-200); border-radius: 9px; object-fit: contain; background: #fff; }
+    .inline-state { padding: 22px; border: 1px dashed var(--slate-300); border-radius: 12px; color: var(--slate-500); text-align: center; font-size: 11px; }
+    .profile-trigger { white-space: nowrap; }
+
     .empty, .error-state, .loading-state { grid-column: 1 / -1; padding: 30px; border: 1px dashed var(--slate-300); border-radius: 14px; color: var(--slate-500); background: #fff; text-align: center; font-size: 12px; }
     .error-state { border-color: #fecaca; color: var(--red-700); background: #fff7f7; }
     .empty i, .error-state i, .loading-state i { display: block; margin-bottom: 9px; font-size: 20px; }
@@ -268,6 +334,8 @@
       .overview-grid, .rank-grid { grid-template-columns: 1fr; }
       .hero { flex-direction: column; }
       .hero-meta { justify-content: flex-start; }
+      .profile-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .profile-dialog { width: calc(100vw - 12px); height: calc(100vh - 12px); max-height: calc(100vh - 12px); margin: 6px; }
     }
     @media (max-width: 650px) {
       .content { padding-inline: 13px; }
@@ -282,6 +350,21 @@
       .dialog-summary { grid-template-columns: 1fr 1fr; }
       .dialog-actions { flex-direction: column-reverse; }
       .dialog-actions .button { width: 100%; }
+      .profile-dialog { width: 100vw; height: 100vh; max-height: 100vh; margin: 0; border-radius: 0; }
+      .profile-head { padding: 15px; }
+      .profile-scroll { padding: 14px 13px 28px; }
+      .profile-head h2 { font-size: 21px; }
+      .profile-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .profile-kpi:last-child { grid-column: 1 / -1; }
+      .profile-card-grid, .profile-summary-grid, .transparency-cost { grid-template-columns: 1fr; }
+      .profile-row { grid-template-columns: 1fr 1fr; gap: 7px 10px; }
+      .profile-row > :first-child { grid-column: 1 / -1; }
+      .profile-row-label { display: block; }
+      .history-row { grid-template-columns: 80px 1fr; }
+      .history-row > :last-child { grid-column: 2; }
+      .history-landing-main { align-items: flex-start; flex-direction: column; }
+      .snapshot-item { grid-template-columns: 1fr 1fr; }
+      .snapshot-item > :last-child { grid-column: 1 / -1; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
@@ -506,6 +589,26 @@
     </div>
   </dialog>
 
+  <dialog id="advertiser-dialog" class="profile-dialog" aria-labelledby="advertiser-profile-title" aria-describedby="advertiser-profile-description">
+    <header class="profile-head">
+      <div class="profile-head-main">
+        <span class="tag derived">Perfil analítico observado</span>
+        <h2 id="advertiser-profile-title">Perfil do concorrente</h2>
+        <div id="advertiser-profile-domain" class="profile-domain">Carregando domínio…</div>
+        <p id="advertiser-profile-description" class="source-line" style="margin:7px 0 0">Baseado somente nas evidências registradas pelo Radar.</p>
+      </div>
+      <div class="profile-head-actions">
+        <a id="advertiser-transparency-link" class="button ghost" href="https://adstransparency.google.com/?region=BR" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-google"></i>Transparência</a>
+        <button id="advertiser-dialog-close" class="icon-button" type="button" aria-label="Fechar perfil do concorrente"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </header>
+    <div id="advertiser-profile-scroll" class="profile-scroll">
+      <div id="advertiser-profile-content" class="profile-state" role="status" aria-live="polite" aria-busy="true">
+        <div><i class="fa-solid fa-circle-notch fa-spin"></i><h3>Carregando perfil observado</h3><p>Consultando criativos, termos e landing pages registrados.</p></div>
+      </div>
+    </div>
+  </dialog>
+
   <script>
     "use strict";
 
@@ -532,7 +635,25 @@
       cancelRequested: false,
       dashboardTimer: null,
       planTimer: null,
+      advertiserDirectory: null,
+      advertiserDirectoryPromise: null,
+      advertiserProfile: {
+        sequence: 0,
+        reference: null,
+        data: null,
+        activeTab: "overview",
+        transparency: { status: "idle", data: null, message: "" },
+      },
     };
+
+    const PROFILE_TABS = [
+      { id: "overview", label: "Visão geral" },
+      { id: "creatives", label: "Criativos observados" },
+      { id: "terms", label: "Termos pesquisados pelo Radar" },
+      { id: "landings", label: "Landing pages" },
+      { id: "history", label: "Histórico" },
+      { id: "transparency", label: "Centro de Transparência" },
+    ];
 
     const $ = (selector, root = document) => root.querySelector(selector);
     const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -595,6 +716,16 @@
 
     function firstArray(...values) {
       return values.find(Array.isArray) || [];
+    }
+
+    function firstPopulatedArray(...values) {
+      return values.find((value) => Array.isArray(value) && value.length)
+        || values.find(Array.isArray)
+        || [];
+    }
+
+    function firstDefined(...values) {
+      return values.find((value) => value !== null && value !== undefined && value !== "");
     }
 
     function firstObject(...values) {
@@ -796,6 +927,7 @@
       const snapshot = firstObject(item.latest_snapshot, item.snapshot);
       return {
         id: item.id,
+        advertiserId: firstDefined(item.advertiser_id, item.advertiserId),
         searchRunId: item.search_run_id,
         advertiser: item.advertiser || item.advertiser_name || item.domain || "Anunciante não identificado",
         domain: item.domain || item.advertiser_domain || "",
@@ -919,6 +1051,7 @@
           ? { text: item, confidence: "Média", kind: "derived" }
           : { text: item.text || item.message || item.insight, confidence: item.confidence || item.confidence_level || (item.kind === "observed" ? "Alta" : "Média"), kind: item.kind || "derived" }).filter((item) => item.text),
         competitors: competitorsRaw.map((item) => ({
+          advertiserId: firstDefined(item.advertiser_id, item.advertiserId, item.id),
           name: item.name || item.advertiser || item.display_name || item.domain,
           domain: item.domain || item.advertiser_domain || "",
           uniqueAds: firstNumber(item.unique_ads_observed, item.unique_ads, item.ads_count),
@@ -958,6 +1091,403 @@
           },
         },
       };
+    }
+
+    function normalizeAdvertiserSummary(item) {
+      return {
+        advertiserId: firstDefined(item.advertiser_id, item.advertiserId, item.id),
+        name: item.advertiser || item.name || item.display_name || item.domain || "Concorrente observado",
+        domain: item.domain || item.advertiser_domain || "",
+        observations: firstNumber(item.observations, item.appearances, item.total_observations),
+        uniqueAds: firstNumber(item.unique_ads_observed, item.unique_ads, item.creatives_count),
+        queryCount: firstNumber(item.query_count, item.queries_observed, item.queries),
+        landingCount: firstNumber(item.landing_page_count, item.landing_pages_observed, item.landing_pages),
+        firstSeen: item.first_observed_at || item.first_seen_at || item.first_seen,
+        lastSeen: item.last_observed_at || item.last_seen_at || item.last_seen,
+      };
+    }
+
+    function normalizeAdvertiserProfile(raw) {
+      const advertiserRaw = firstObject(raw.advertiser_observed_profile, raw.advertiser, raw.profile, raw.item);
+      const metricsRaw = firstObject(raw.metrics, advertiserRaw.metrics, advertiserRaw);
+      const summary = normalizeAdvertiserSummary({ ...advertiserRaw, ...metricsRaw });
+      const queries = firstPopulatedArray(raw.top_queries_observed, raw.queries, raw.term_map?.items, raw.terms, raw.keywords).map((item) => ({
+        query: item.query_observed || item.query || item.keyword || item.term || "Consulta não informada",
+        observations: firstNumber(item.observations, item.appearances, item.count),
+        searchRuns: firstNumber(item.search_runs_with_presence, item.search_runs, item.completed_runs, item.runs),
+        locations: firstPopulatedArray(item.locations_observed, item.locations, item.regions, item.cities).map(String),
+        devices: firstPopulatedArray(item.devices_observed, item.devices).map(String),
+        lastObservedAt: item.last_observed_at || item.last_seen_at || item.last_seen,
+      }));
+      const creatives = firstPopulatedArray(raw.recent_creative_variations_observed, raw.creatives, raw.ads, raw.ad_creatives).map((item) => ({
+        fingerprint: item.variation_fingerprint || item.fingerprint || item.id || "",
+        title: item.title || item.headline || "Criativo sem título",
+        description: item.description || item.copy || "Descrição não disponível.",
+        targetUrl: item.target_url || item.landing_page_url || item.link || "",
+        observations: firstNumber(item.observations, item.appearances, item.count),
+        firstObservedAt: item.first_observed_at || item.first_seen_at || item.first_seen,
+        lastObservedAt: item.last_observed_at || item.last_seen_at || item.last_seen,
+        queries: firstPopulatedArray(item.queries_observed, item.queries, item.terms, item.keywords).map(String),
+        locations: firstPopulatedArray(item.locations_observed, item.locations, item.regions, item.cities).map(String),
+        devices: firstPopulatedArray(item.devices_observed, item.devices).map(String),
+      }));
+      const landingPages = firstPopulatedArray(raw.landing_pages_observed, raw.landing_pages, raw.landings, raw.pages).map((item) => {
+        const snapshot = firstObject(item.latest_snapshot, item.snapshot);
+        return {
+          landingPageId: firstDefined(item.landing_page_id, item.landingPageId, item.id),
+          url: item.url || item.canonical_url || item.target_url || "",
+          observations: firstNumber(item.observations, item.appearances, item.count),
+          firstObservedAt: item.first_observed_at || item.first_seen_at || item.first_seen,
+          lastObservedAt: item.last_observed_at || item.last_seen_at || item.last_seen,
+          snapshotCount: firstNumber(item.snapshot_count, item.snapshots_count),
+          latestSnapshot: {
+            status: snapshot.status || snapshot.capture_status || "",
+            h1: snapshot.h1 || snapshot.headline || "",
+            primaryCta: snapshot.primary_cta || "",
+            screenshotUrl: snapshot.screenshot_url || snapshot.screenshot_path || "",
+            capturedAt: snapshot.captured_at,
+          },
+        };
+      });
+      const timeline = firstPopulatedArray(raw.timeline_observed, raw.timeline, raw.history, raw.series).map((item) => ({
+        date: item.observed_day || item.date || item.day || item.period,
+        observations: firstNumber(item.observations, item.appearances, item.count),
+        uniqueAds: firstNumber(item.unique_ads_observed, item.unique_ads, item.creatives),
+        searchRuns: firstNumber(item.search_runs_with_presence, item.search_runs, item.completed_runs, item.runs),
+      })).filter((item) => item.date);
+      return {
+        advertiser: {
+          ...summary,
+          advertiserId: firstDefined(summary.advertiserId, raw.advertiser_id),
+          name: summary.name || "Concorrente observado",
+        },
+        metrics: {
+          observations: firstNumber(metricsRaw.observations, metricsRaw.appearances, summary.observations),
+          uniqueAds: firstNumber(metricsRaw.unique_ads_observed, metricsRaw.unique_ads, summary.uniqueAds, creatives.length),
+          searchRuns: firstNumber(metricsRaw.search_runs_with_presence, metricsRaw.search_runs, metricsRaw.runs),
+          queries: firstNumber(metricsRaw.queries_observed, metricsRaw.query_count, summary.queryCount, queries.length),
+          landingPages: firstNumber(metricsRaw.landing_pages_observed, metricsRaw.landing_page_count, summary.landingCount, landingPages.length),
+        },
+        queries,
+        creatives,
+        landingPages,
+        timeline,
+        methodology: firstObject(raw.methodology),
+      };
+    }
+
+    async function loadAdvertiserDirectory() {
+      if (Array.isArray(state.advertiserDirectory)) return state.advertiserDirectory;
+      if (state.advertiserDirectoryPromise) return state.advertiserDirectoryPromise;
+      const params = dashboardQueryString();
+      state.advertiserDirectoryPromise = fetchJson(`/api/radar/advertisers?${params}&page_size=100`, {}, 20000)
+        .then((raw) => {
+          const items = firstPopulatedArray(raw.advertisers_observed, raw.advertisers, raw.items, raw.results, raw.data).map(normalizeAdvertiserSummary);
+          state.advertiserDirectory = items;
+          return items;
+        })
+        .finally(() => { state.advertiserDirectoryPromise = null; });
+      return state.advertiserDirectoryPromise;
+    }
+
+    function normalizedDomain(value) {
+      return String(value || "").trim().toLocaleLowerCase("pt-BR").replace(/^www\./, "");
+    }
+
+    async function resolveAdvertiserReference(reference) {
+      if (reference.advertiserId) return reference;
+      const domain = normalizedDomain(reference.domain);
+      const name = String(reference.name || "").trim().toLocaleLowerCase("pt-BR");
+      const localMatch = state.dashboard?.competitors?.find((item) => (
+        (domain && normalizedDomain(item.domain) === domain)
+        || (name && String(item.name || "").trim().toLocaleLowerCase("pt-BR") === name)
+      ));
+      if (localMatch?.advertiserId) return { ...reference, advertiserId: localMatch.advertiserId };
+      const directory = await loadAdvertiserDirectory();
+      const match = directory.find((item) => (
+        (domain && normalizedDomain(item.domain) === domain)
+        || (name && String(item.name || "").trim().toLocaleLowerCase("pt-BR") === name)
+      ));
+      if (!match?.advertiserId) throw new Error("Este registro ainda não pôde ser vinculado a um perfil analítico.");
+      return { ...reference, ...match };
+    }
+
+    function profileReference(item) {
+      const domain = item.domain || item.advertiser_domain || "";
+      const match = state.dashboard?.competitors?.find((candidate) => normalizedDomain(candidate.domain) === normalizedDomain(domain));
+      return {
+        advertiserId: firstDefined(item.advertiserId, item.advertiser_id, match?.advertiserId),
+        domain,
+        name: item.name || item.advertiser || match?.name || domain || "Concorrente observado",
+      };
+    }
+
+    function advertiserProfileButton(item, label = "Ver perfil") {
+      const reference = profileReference(item);
+      if (!reference.advertiserId && !reference.domain && !reference.name) return "";
+      return `<button class="button ghost profile-trigger" type="button" data-open-advertiser data-advertiser-id="${escapeHtml(reference.advertiserId || "")}" data-advertiser-domain="${escapeHtml(reference.domain)}" data-advertiser-name="${escapeHtml(reference.name)}" aria-label="Abrir perfil analítico de ${escapeHtml(reference.name)}"><i class="fa-solid fa-chart-line"></i>${escapeHtml(label)}</button>`;
+    }
+
+    function profileKpi(value, label) {
+      return `<div class="profile-kpi"><strong>${escapeHtml(value)}</strong><span>${escapeHtml(label)}</span></div>`;
+    }
+
+    function profileEmpty(icon, message) {
+      return `<div class="inline-state"><i class="fa-solid ${icon}" style="display:block;margin-bottom:8px"></i>${escapeHtml(message)}</div>`;
+    }
+
+    function renderProfileOverview(data) {
+      const allLocations = [...new Set(data.queries.flatMap((item) => item.locations))];
+      const allDevices = [...new Set(data.queries.flatMap((item) => item.devices))];
+      const topQueries = data.queries.slice(0, 5);
+      return `<div class="profile-section"><div class="profile-section-head"><div><h3>Cobertura observada</h3><p>Dimensões nas quais o anunciante apareceu nas buscas registradas.</p></div><span class="tag collected">Dado coletado</span></div><div class="profile-summary-grid"><div class="profile-summary"><strong>${formatNumber(data.metrics.observations)}</strong><span>Aparições registradas</span></div><div class="profile-summary"><strong>${formatNumber(data.metrics.searchRuns)}</strong><span>Buscas com presença</span></div><div class="profile-summary"><strong>${formatNumber(allLocations.length)}</strong><span>Regiões observadas</span></div></div><div class="chips" style="margin-top:12px">${[...allLocations.map((item) => `Região: ${item}`), ...allDevices.map((item) => `Dispositivo: ${item}`)].slice(0, 12).map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join("") || '<span class="chip">Dimensões não informadas</span>'}</div></div><div class="profile-section"><div class="profile-section-head"><div><h3>Consultas com maior presença observada</h3><p>São termos executados pelo Radar, não palavras-chave compradas pelo concorrente.</p></div><span class="tag derived">Leitura derivada</span></div>${topQueries.length ? `<div class="profile-rows">${topQueries.map((item) => `<div class="profile-row"><strong>${escapeHtml(item.query)}</strong><span><span class="profile-row-label">Aparições</span>${formatNumber(item.observations)} aparições</span><span><span class="profile-row-label">Buscas</span>${formatNumber(item.searchRuns)} buscas</span><span><span class="profile-row-label">Última observação</span>${escapeHtml(formatDate(item.lastObservedAt))}</span></div>`).join("")}</div>` : profileEmpty("fa-magnifying-glass", "Nenhuma consulta associada a este concorrente no recorte disponível.")}</div>`;
+    }
+
+    function renderProfileCreatives(data) {
+      if (!data.creatives.length) return profileEmpty("fa-rectangle-ad", "Nenhum criativo observado foi associado a este concorrente.");
+      return `<div class="profile-section"><div class="profile-section-head"><div><h3>Criativos únicos observados</h3><p>Deduplicados pelo Radar; não representam todo o inventário do anunciante.</p></div><span class="tag derived">Dado derivado</span></div><div class="profile-card-grid">${data.creatives.map((item) => {
+        const target = safeLandingUrl(item.targetUrl);
+        const chips = [...item.queries.slice(0, 3), ...item.locations.slice(0, 2), ...item.devices.slice(0, 2)];
+        return `<article class="profile-card"><span class="tag collected">${formatNumber(item.observations)} aparições</span><h4>${escapeHtml(item.title)}</h4><p>${escapeHtml(item.description)}</p><div class="chips">${chips.map((chip) => `<span class="chip">${escapeHtml(chip)}</span>`).join("")}</div><div class="source-line"><span>${escapeHtml(formatDate(item.firstObservedAt))}</span><span>→</span><span>${escapeHtml(formatDate(item.lastObservedAt))}</span></div>${target ? `<a class="button ghost" href="${escapeHtml(target)}" target="_blank" rel="noopener noreferrer" style="margin-top:10px"><i class="fa-solid fa-arrow-up-right-from-square"></i>Abrir landing observada</a>` : ""}</article>`;
+      }).join("")}</div></div>`;
+    }
+
+    function renderProfileTerms(data) {
+      if (!data.queries.length) return profileEmpty("fa-magnifying-glass", "Nenhum termo pesquisado pelo Radar foi associado a este concorrente.");
+      return `<div class="profile-caveat"><i class="fa-solid fa-circle-info"></i><span><b>Importante:</b> estes são termos pesquisados pelo Radar nos quais o anúncio apareceu. Eles não revelam nem comprovam as palavras-chave compradas pelo concorrente.</span></div><div class="profile-section"><div class="profile-section-head"><div><h3>Mapa de termos observados</h3><p>Frequência dentro da amostra coletada.</p></div><span class="tag collected">Radar PFA</span></div><div class="profile-rows">${data.queries.map((item) => `<div class="profile-row"><strong>${escapeHtml(item.query)}</strong><span><span class="profile-row-label">Aparições</span>${formatNumber(item.observations)} aparições</span><span><span class="profile-row-label">Buscas</span>${formatNumber(item.searchRuns)} buscas</span><span><span class="profile-row-label">Contexto</span>${escapeHtml([...item.locations, ...item.devices].slice(0, 3).join(" · ") || "não informado")}</span></div>`).join("")}</div></div>`;
+    }
+
+    function renderProfileLandings(data) {
+      if (!data.landingPages.length) return profileEmpty("fa-window-maximize", "Nenhuma landing page foi associada às observações deste concorrente.");
+      return `<div class="profile-section"><div class="profile-section-head"><div><h3>Landing pages associadas</h3><p>URLs e capturas passivas encontradas nas observações.</p></div><span class="tag collected">Dado coletado</span></div><div class="profile-card-grid">${data.landingPages.map((item) => {
+        const target = safeLandingUrl(item.url);
+        const snapshot = item.latestSnapshot;
+        const captured = snapshot.status === "captured";
+        return `<article class="profile-card"><span class="tag ${captured ? "collected" : "warning"}">${captured ? "Captura concluída" : snapshot.status === "failed" ? "Captura falhou" : "URL observada"}</span><h4>${escapeHtml(snapshot.h1 || item.url || "Landing page")}</h4>${snapshot.primaryCta ? `<p><b>CTA:</b> ${escapeHtml(snapshot.primaryCta)}</p>` : ""}<div class="chips"><span class="chip">${formatNumber(item.observations)} aparições</span><span class="chip">${formatNumber(item.snapshotCount)} snapshots</span></div><div class="source-line"><span>${escapeHtml(formatDate(item.firstObservedAt))}</span><span>→</span><span>${escapeHtml(formatDate(item.lastObservedAt))}</span></div>${target ? `<a class="button ghost" href="${escapeHtml(target)}" target="_blank" rel="noopener noreferrer" style="margin-top:10px"><i class="fa-solid fa-arrow-up-right-from-square"></i>Abrir página</a>` : ""}</article>`;
+      }).join("")}</div></div>`;
+    }
+
+    function renderProfileHistory(data) {
+      const max = Math.max(...data.timeline.map((item) => item.observations), 1);
+      const timeline = data.timeline.length
+        ? `<div class="profile-history">${data.timeline.map((item) => `<div class="history-row"><strong>${escapeHtml(formatDate(item.date))}</strong><div class="history-bar" title="${formatNumber(item.observations)} aparições"><span style="width:${Math.max(2, Math.round((item.observations / max) * 100))}%"></span></div><span>${formatNumber(item.observations)} aparições · ${formatNumber(item.uniqueAds)} únicos</span></div>`).join("")}</div>`
+        : profileEmpty("fa-clock-rotate-left", "Ainda não há série histórica suficiente para este concorrente.");
+      const landingHistory = data.landingPages.length
+        ? data.landingPages.map((item) => `<div class="history-landing"><div class="history-landing-main"><div><strong>${escapeHtml(item.url || "Landing page")}</strong><span class="source-line">${formatNumber(item.snapshotCount)} snapshots registrados</span></div><button class="button ghost" type="button" data-load-snapshots data-landing-page-id="${escapeHtml(item.landingPageId || "")}" ${item.landingPageId ? "" : "disabled"}><i class="fa-solid fa-clock-rotate-left"></i>Ver snapshots</button></div><div class="snapshot-result" aria-live="polite"></div></div>`).join("")
+        : profileEmpty("fa-window-maximize", "Nenhuma landing page disponível para consultar snapshots.");
+      return `<div class="profile-section"><div class="profile-section-head"><div><h3>Linha do tempo de aparições</h3><p>Histórico observado nas buscas do Radar.</p></div><span class="tag collected">Dado coletado</span></div>${timeline}</div><div class="profile-section"><div class="profile-section-head"><div><h3>Histórico de landing pages</h3><p>A consulta detalhada ocorre somente ao clicar.</p></div><span class="tag collected">Snapshots</span></div>${landingHistory}</div>`;
+    }
+
+    function transparencyPanelShell() {
+      return `<div class="profile-section transparency-center"><div class="profile-section-head"><div><h3>Centro de Transparência Google</h3><p>Consulta complementar e manual de criativos públicos.</p></div><span class="tag collected">Transparência Google / observado</span></div><div class="profile-caveat"><i class="fa-solid fa-triangle-exclamation"></i><span>Os resultados não comprovam inventário completo, investimento, segmentação nem que uma campanha esteja ativa neste momento.</span></div><div class="transparency-cost"><div><strong>até 100</strong><span>criativos por consulta</span></div><div><strong>~1 crédito</strong><span>estimativa de consumo</span></div><div><strong>0 páginas extras</strong><span>sem paginação automática</span></div></div><div id="transparency-content" aria-live="polite"></div></div>`;
+    }
+
+    function renderProfileLoading(reference = {}) {
+      $("#advertiser-profile-title").textContent = reference.name || "Perfil do concorrente";
+      $("#advertiser-profile-domain").textContent = reference.domain || "Resolvendo anunciante…";
+      const content = $("#advertiser-profile-content");
+      content.className = "profile-state";
+      content.setAttribute("role", "status");
+      content.setAttribute("aria-live", "polite");
+      content.setAttribute("aria-busy", "true");
+      content.innerHTML = '<div><i class="fa-solid fa-circle-notch fa-spin"></i><h3>Carregando perfil observado</h3><p>Consultando criativos, termos e landing pages registrados.</p></div>';
+    }
+
+    function renderProfileError(message) {
+      const content = $("#advertiser-profile-content");
+      content.className = "profile-state";
+      content.setAttribute("role", "alert");
+      content.removeAttribute("aria-live");
+      content.setAttribute("aria-busy", "false");
+      content.innerHTML = `<div><i class="fa-solid fa-circle-exclamation" style="color:var(--red-700)"></i><h3>Perfil indisponível</h3><p>${escapeHtml(message)}</p><button class="button secondary" type="button" data-action="retry-profile"><i class="fa-solid fa-rotate-right"></i>Tentar novamente</button></div>`;
+    }
+
+    function renderAdvertiserProfile(data) {
+      const advertiser = data.advertiser;
+      state.advertiserProfile.data = data;
+      $("#advertiser-profile-title").textContent = advertiser.name;
+      $("#advertiser-profile-domain").textContent = advertiser.domain || "Domínio não informado";
+      $("#advertiser-transparency-link").href = transparencyUrl(advertiser);
+      const content = $("#advertiser-profile-content");
+      content.className = "";
+      content.removeAttribute("role");
+      content.removeAttribute("aria-live");
+      content.setAttribute("aria-busy", "false");
+      const tabs = PROFILE_TABS.map((tab, index) => `<button id="profile-tab-${tab.id}" class="profile-tab" type="button" role="tab" aria-selected="${index === 0}" aria-controls="profile-panel-${tab.id}" tabindex="${index === 0 ? "0" : "-1"}" data-profile-tab="${tab.id}">${escapeHtml(tab.label)}</button>`).join("");
+      const panels = {
+        overview: renderProfileOverview(data),
+        creatives: renderProfileCreatives(data),
+        terms: renderProfileTerms(data),
+        landings: renderProfileLandings(data),
+        history: renderProfileHistory(data),
+        transparency: transparencyPanelShell(),
+      };
+      content.innerHTML = `<div class="profile-caveat"><i class="fa-solid fa-shield-halved"></i><span><b>Escopo da leitura:</b> todos os números são evidências observadas nas consultas do Radar. Não representam keywords compradas, investimento, impression share ou o inventário completo do concorrente.</span></div><div class="profile-kpis">${profileKpi(formatNumber(data.metrics.uniqueAds), "Criativos únicos observados")}${profileKpi(formatNumber(data.metrics.queries), "Consultas observadas")}${profileKpi(formatNumber(data.metrics.landingPages), "Landing pages observadas")}${profileKpi(formatDate(advertiser.firstSeen), "Primeira aparição")}${profileKpi(formatDate(advertiser.lastSeen), "Última aparição")}</div><div class="profile-tabs" role="tablist" aria-label="Seções do perfil do concorrente">${tabs}</div>${PROFILE_TABS.map((tab, index) => `<section id="profile-panel-${tab.id}" class="profile-panel" role="tabpanel" aria-labelledby="profile-tab-${tab.id}" ${index === 0 ? "" : "hidden"}>${panels[tab.id]}</section>`).join("")}`;
+      activateProfileTab("overview");
+    }
+
+    function activateProfileTab(tabId, focusTab = false) {
+      if (!PROFILE_TABS.some((tab) => tab.id === tabId)) return;
+      state.advertiserProfile.activeTab = tabId;
+      $$("[data-profile-tab]", $("#advertiser-dialog")).forEach((button) => {
+        const active = button.dataset.profileTab === tabId;
+        button.setAttribute("aria-selected", String(active));
+        button.tabIndex = active ? 0 : -1;
+        if (active && focusTab) button.focus();
+      });
+      $$(".profile-panel", $("#advertiser-dialog")).forEach((panel) => {
+        panel.hidden = panel.id !== `profile-panel-${tabId}`;
+      });
+      if (tabId === "transparency") loadTransparencyStored();
+    }
+
+    async function openAdvertiserProfile(reference) {
+      const dialog = $("#advertiser-dialog");
+      if (!dialog.open) dialog.showModal();
+      const sequence = ++state.advertiserProfile.sequence;
+      state.advertiserProfile.reference = { ...reference };
+      state.advertiserProfile.data = null;
+      state.advertiserProfile.activeTab = "overview";
+      state.advertiserProfile.transparency = { status: "idle", data: null, message: "" };
+      renderProfileLoading(reference);
+      try {
+        const resolved = await resolveAdvertiserReference(reference);
+        if (sequence !== state.advertiserProfile.sequence || !dialog.open) return;
+        state.advertiserProfile.reference = resolved;
+        const raw = await fetchJson(`/api/radar/advertisers/${encodeURIComponent(resolved.advertiserId)}?${dashboardQueryString()}`, {}, 25000);
+        if (sequence !== state.advertiserProfile.sequence || !dialog.open) return;
+        const data = normalizeAdvertiserProfile(raw);
+        if (!data.advertiser.advertiserId) data.advertiser.advertiserId = resolved.advertiserId;
+        if (!data.advertiser.domain) data.advertiser.domain = resolved.domain || "";
+        if (!data.advertiser.name) data.advertiser.name = resolved.name || data.advertiser.domain;
+        renderAdvertiserProfile(data);
+      } catch (error) {
+        if (sequence !== state.advertiserProfile.sequence || !dialog.open) return;
+        renderProfileError(error.status === 404
+          ? "O perfil detalhado estará disponível após a atualização da API."
+          : error.message || "Não foi possível carregar o perfil analítico.");
+      }
+    }
+
+    function transparencyEpochDate(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric) || numeric <= 0) return null;
+      const date = new Date(numeric < 1e12 ? numeric * 1000 : numeric);
+      return Number.isNaN(date.getTime()) ? null : date.toISOString();
+    }
+
+    function normalizeTransparency(raw) {
+      const container = firstObject(raw.data, raw.result, raw.transparency, raw);
+      const items = firstPopulatedArray(container.creatives, container.items, container.ads, container.results, raw.creatives, raw.items).slice(0, 100).map((item) => ({
+        title: item.title || item.headline || item.ad_title || item.advertiser_name || (item.ad_creative_id ? `Criativo ${item.ad_creative_id}` : "Criativo observado"),
+        description: item.description || item.copy || item.text || [item.creative_format, item.target_domain].filter(Boolean).join(" · ") || "Metadados textuais não disponíveis.",
+        format: item.creative_format || item.format || item.type || item.ad_format || "formato não informado",
+        previewUrl: item.preview_link || item.details_link || item.target_url || item.landing_page_url || item.link || "",
+        imageUrl: item.image_url || item.thumbnail_url || "",
+        firstShown: item.first_shown || item.first_seen_at || item.start_date || transparencyEpochDate(item.first_shown_epoch),
+        lastShown: item.last_shown || item.last_seen_at || item.end_date || transparencyEpochDate(item.last_shown_epoch),
+      }));
+      return {
+        items,
+        observedAt: container.latest_scan?.completed_at || container.latest_scan?.requested_at || container.observed_at || container.collected_at || container.updated_at || raw.observed_at || new Date().toISOString(),
+      };
+    }
+
+    function renderTransparencyState() {
+      const container = $("#transparency-content");
+      if (!container) return;
+      const current = state.advertiserProfile.transparency;
+      if (current.status === "loading") {
+        container.innerHTML = '<div class="inline-state"><i class="fa-solid fa-circle-notch fa-spin" style="display:block;margin-bottom:8px"></i>Consultando o Centro de Transparência…</div>';
+        return;
+      }
+      if (current.status === "unavailable") {
+        container.innerHTML = '<div class="inline-state"><i class="fa-solid fa-clock" style="display:block;margin-bottom:8px"></i>Disponível após atualização da API.</div>';
+        return;
+      }
+      if (current.status === "error") {
+        container.innerHTML = `<div class="inline-state"><i class="fa-solid fa-circle-exclamation" style="display:block;margin-bottom:8px"></i>${escapeHtml(current.message || "Não foi possível consultar os dados armazenados.")}<br><button class="button secondary" type="button" data-action="retry-transparency" style="margin-top:10px">Tentar novamente</button></div>`;
+        return;
+      }
+      if (current.status === "success") {
+        const data = current.data;
+        const results = data.items.length
+          ? `<div class="profile-card-grid" style="margin-top:12px">${data.items.map((item) => {
+            const preview = safeUrl(item.previewUrl);
+            const image = safeUrl(item.imageUrl);
+            return `<article class="profile-card">${image ? `<img class="transparency-image" src="${escapeHtml(image)}" alt="Prévia do criativo observado no Centro de Transparência" loading="lazy">` : ""}<span class="tag collected">Transparência Google / observado</span><h4>${escapeHtml(item.title)}</h4><p>${escapeHtml(item.description)}</p><div class="chips"><span class="chip">${escapeHtml(item.format)}</span></div><div class="source-line"><span>${escapeHtml(formatDate(item.firstShown))}</span><span>→</span><span>${escapeHtml(formatDate(item.lastShown))}</span></div>${preview ? `<a class="button ghost" href="${escapeHtml(preview)}" target="_blank" rel="noopener noreferrer" style="margin-top:9px">Abrir criativo no Google</a>` : ""}</article>`;
+          }).join("")}</div>`
+          : profileEmpty("fa-rectangle-ad", "Nenhum criativo foi retornado nessa consulta. Isso não comprova ausência de campanhas.");
+        container.innerHTML = `<div class="source-line"><span>${formatNumber(data.items.length)} criativos retornados</span><span>·</span><span>Consulta de ${escapeHtml(formatDate(data.observedAt, true))}</span></div>${results}<button class="button primary" type="button" data-action="scan-transparency" style="margin-top:12px"><i class="fa-solid fa-magnifying-glass"></i>Nova consulta manual (~1 crédito)</button>`;
+        return;
+      }
+      container.innerHTML = '<div class="inline-state">Consulte resultados já armazenados ou inicie manualmente uma única busca, sem paginação automática.</div><button class="button primary" type="button" data-action="scan-transparency" style="margin-top:12px"><i class="fa-solid fa-magnifying-glass"></i>Consultar manualmente (~1 crédito)</button>';
+    }
+
+    async function loadTransparencyStored() {
+      const profile = state.advertiserProfile;
+      if (!profile.data || profile.transparency.status !== "idle") {
+        renderTransparencyState();
+        return;
+      }
+      const advertiserId = profile.data.advertiser.advertiserId || profile.reference?.advertiserId;
+      if (!advertiserId) return;
+      profile.transparency = { status: "loading", data: null, message: "" };
+      renderTransparencyState();
+      try {
+        const raw = await fetchJson(`/api/radar/advertisers/${encodeURIComponent(advertiserId)}/transparency`, {}, 20000);
+        profile.transparency = { status: "success", data: normalizeTransparency(raw), message: "" };
+      } catch (error) {
+        profile.transparency = error.status === 404
+          ? { status: "unavailable", data: null, message: "" }
+          : { status: "error", data: null, message: error.message };
+      }
+      renderTransparencyState();
+    }
+
+    async function executeTransparencyScan() {
+      const profile = state.advertiserProfile;
+      const advertiserId = profile.data?.advertiser?.advertiserId || profile.reference?.advertiserId;
+      if (!advertiserId || profile.transparency.status === "loading") return;
+      const confirmed = window.confirm("Confirmar consulta manual ao Centro de Transparência? A estimativa é de 1 crédito para até 100 criativos, sem paginação automática.");
+      if (!confirmed) return;
+      profile.transparency = { status: "loading", data: null, message: "" };
+      renderTransparencyState();
+      try {
+        const scanResult = await fetchJson(`/api/radar/advertisers/${encodeURIComponent(advertiserId)}/transparency/scan`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ confirm_cost: true, num: 100 }),
+        }, 60000);
+        const storedResult = await fetchJson(`/api/radar/advertisers/${encodeURIComponent(advertiserId)}/transparency`, {}, 20000).catch(() => scanResult);
+        profile.transparency = { status: "success", data: normalizeTransparency(storedResult), message: "" };
+      } catch (error) {
+        profile.transparency = error.status === 404
+          ? { status: "unavailable", data: null, message: "" }
+          : { status: "error", data: null, message: error.message || "A consulta manual falhou." };
+      }
+      renderTransparencyState();
+    }
+
+    async function loadLandingSnapshots(button) {
+      const landingPageId = button.dataset.landingPageId;
+      const result = button.closest(".history-landing")?.querySelector(".snapshot-result");
+      if (!landingPageId || !result || button.disabled) return;
+      button.disabled = true;
+      result.innerHTML = '<div class="inline-state"><i class="fa-solid fa-circle-notch fa-spin"></i> Carregando snapshots…</div>';
+      try {
+        const raw = await fetchJson(`/api/radar/landing-pages/${encodeURIComponent(landingPageId)}/snapshots`, {}, 20000);
+        const snapshots = firstPopulatedArray(raw.snapshots_observed, raw.snapshots, raw.items, raw.results, raw.data);
+        result.innerHTML = snapshots.length
+          ? snapshots.map((item) => `<div class="snapshot-item"><span>${escapeHtml(formatDate(item.captured_at || item.observed_at, true))}</span><span class="tag ${item.status === "captured" || item.capture_status === "captured" ? "collected" : "warning"}">${escapeHtml(item.status || item.capture_status || "registrado")}</span><span>${escapeHtml(item.h1 || item.headline || item.primary_cta || "Conteúdo não extraído")}</span></div>`).join("")
+          : profileEmpty("fa-clock-rotate-left", "Nenhum snapshot detalhado foi retornado.");
+      } catch (error) {
+        result.innerHTML = error.status === 404
+          ? '<div class="inline-state">Disponível após atualização da API.</div>'
+          : `<div class="inline-state">${escapeHtml(error.message || "Não foi possível carregar os snapshots.")}</div>`;
+      } finally {
+        button.disabled = false;
+      }
     }
 
     function kpiCard(icon, value, label, type, meta) {
@@ -1032,7 +1562,7 @@
       if (!data.competitors.length) {
         competitors.innerHTML = '<li class="empty"><i class="fa-solid fa-building-circle-xmark"></i>Nenhum concorrente observado neste recorte.</li>';
       } else {
-        competitors.innerHTML = data.competitors.slice(0, 8).map((item, index) => `<li class="rank-row"><span class="rank-pos">${index + 1}</span><div class="rank-name"><strong>${escapeHtml(item.name || item.domain || "Anunciante")}</strong><span>${escapeHtml(item.domain || "domínio não informado")} · ${formatNumber(item.presenceRate)}% de presença na amostra · ${formatNumber(item.regions)} regiões</span></div><div class="rank-metrics"><span class="metric-mini"><b>${formatNumber(item.uniqueAds)}</b><small>únicos observados</small></span><span class="metric-mini"><b>${formatNumber(item.appearances)}</b><small>aparições</small></span><div class="rank-actions"><a class="button ghost" href="${escapeHtml(transparencyUrl(item))}" target="_blank" rel="noopener noreferrer" aria-label="Consultar ${escapeHtml(item.domain || item.name)} no Google Ads Transparency"><i class="fa-brands fa-google"></i>Transparência</a></div></div></li>`).join("");
+        competitors.innerHTML = data.competitors.slice(0, 8).map((item, index) => `<li class="rank-row"><span class="rank-pos">${index + 1}</span><div class="rank-name"><strong>${escapeHtml(item.name || item.domain || "Anunciante")}</strong><span>${escapeHtml(item.domain || "domínio não informado")} · ${formatNumber(item.presenceRate)}% de presença na amostra · ${formatNumber(item.regions)} regiões</span></div><div class="rank-metrics"><span class="metric-mini"><b>${formatNumber(item.uniqueAds)}</b><small>únicos observados</small></span><span class="metric-mini"><b>${formatNumber(item.appearances)}</b><small>aparições</small></span><div class="rank-actions">${advertiserProfileButton(item, "Perfil")}${`<a class="button ghost" href="${escapeHtml(transparencyUrl(item))}" target="_blank" rel="noopener noreferrer" aria-label="Consultar ${escapeHtml(item.domain || item.name)} no Google Ads Transparency"><i class="fa-brands fa-google"></i>Transparência</a>`}</div></div></li>`).join("");
       }
 
       const queries = $("#query-ranking");
@@ -1058,7 +1588,7 @@
       }
       grid.innerHTML = data.observations.slice(0, 9).map((item) => {
         const transparency = transparencyUrl({ domain: item.domain });
-        return `<article class="card evidence-card"><div class="ad-preview"><small>${escapeHtml(item.advertiser)}</small><p>${escapeHtml(item.description)}</p></div><div class="evidence-body"><span class="tag collected" style="align-self:flex-start;margin-bottom:9px">Dado coletado</span><h3>${escapeHtml(item.title)}</h3><div class="domain">${escapeHtml(item.domain || item.targetUrl)}</div><div class="chips"><span class="chip">${escapeHtml(item.keyword || "consulta não informada")}</span><span class="chip">${escapeHtml(item.location || "região não informada")}</span><span class="chip">${escapeHtml(item.device || "dispositivo não informado")}</span></div><div class="source-line"><span>Fonte: Google Ads observado</span><span>·</span><span>${escapeHtml(formatDate(item.observedAt, true))}</span><span>·</span><span class="confidence">Confiança alta</span></div><div class="evidence-footer"><div class="evidence-actions">${landingButton(item.targetUrl)}<a class="button ghost" href="${escapeHtml(transparency)}" target="_blank" rel="noopener noreferrer" aria-label="Consultar ${escapeHtml(item.domain)} no Google Ads Transparency"><i class="fa-brands fa-google"></i>Transparência</a></div></div></div></article>`;
+        return `<article class="card evidence-card"><div class="ad-preview"><small>${escapeHtml(item.advertiser)}</small><p>${escapeHtml(item.description)}</p></div><div class="evidence-body"><span class="tag collected" style="align-self:flex-start;margin-bottom:9px">Dado coletado</span><h3>${escapeHtml(item.title)}</h3><div class="domain">${escapeHtml(item.domain || item.targetUrl)}</div><div class="chips"><span class="chip">${escapeHtml(item.keyword || "consulta não informada")}</span><span class="chip">${escapeHtml(item.location || "região não informada")}</span><span class="chip">${escapeHtml(item.device || "dispositivo não informado")}</span></div><div class="source-line"><span>Fonte: Google Ads observado</span><span>·</span><span>${escapeHtml(formatDate(item.observedAt, true))}</span><span>·</span><span class="confidence">Confiança alta</span></div><div class="evidence-footer"><div class="evidence-actions">${advertiserProfileButton(item, "Perfil analítico")}${landingButton(item.targetUrl)}<a class="button ghost" href="${escapeHtml(transparency)}" target="_blank" rel="noopener noreferrer" aria-label="Consultar ${escapeHtml(item.domain)} no Google Ads Transparency"><i class="fa-brands fa-google"></i>Transparência</a></div></div></div></article>`;
       }).join("");
     }
 
@@ -1090,7 +1620,7 @@
           ...signals,
           item.domain || "domínio não informado",
         ];
-        return `<article class="card landing-card"><div class="landing-shot">${screenshot ? `<img src="${escapeHtml(screenshot)}" alt="Captura observada da landing page de ${escapeHtml(item.advertiser || item.domain)}" loading="lazy">` : '<div class="landing-placeholder"><i class="fa-regular fa-image"></i></div>'}</div><div class="landing-body"><span class="tag ${tagClass}" style="align-self:flex-start;margin-bottom:8px">${tagText}</span><h3>${escapeHtml(item.h1 || item.title || "Headline não identificada")}</h3><p>${escapeHtml(subtitle)}</p><div class="chips">${chips.map((chip) => `<span class="chip">${escapeHtml(chip)}</span>`).join("")}</div><div class="source-line"><span>${sourceText}</span><span>·</span><span>${escapeHtml(formatDate(item.capturedAt || item.observedAt, true))}</span><span>·</span><span class="confidence">${confidenceText}</span></div><div class="evidence-footer">${landingButton(item.targetUrl || item.url)}</div></div></article>`;
+        return `<article class="card landing-card"><div class="landing-shot">${screenshot ? `<img src="${escapeHtml(screenshot)}" alt="Captura observada da landing page de ${escapeHtml(item.advertiser || item.domain)}" loading="lazy">` : '<div class="landing-placeholder"><i class="fa-regular fa-image"></i></div>'}</div><div class="landing-body"><span class="tag ${tagClass}" style="align-self:flex-start;margin-bottom:8px">${tagText}</span><h3>${escapeHtml(item.h1 || item.title || "Headline não identificada")}</h3><p>${escapeHtml(subtitle)}</p><div class="chips">${chips.map((chip) => `<span class="chip">${escapeHtml(chip)}</span>`).join("")}</div><div class="source-line"><span>${sourceText}</span><span>·</span><span>${escapeHtml(formatDate(item.capturedAt || item.observedAt, true))}</span><span>·</span><span class="confidence">${confidenceText}</span></div><div class="evidence-footer"><div class="evidence-actions">${advertiserProfileButton(item, "Perfil analítico")}${landingButton(item.targetUrl || item.url)}</div></div></div></article>`;
       }).join("");
       $$(".landing-shot img", grid).forEach((image) => image.addEventListener("error", () => {
         image.parentElement.innerHTML = '<div class="landing-placeholder"><i class="fa-regular fa-image"></i></div>';
@@ -1239,6 +1769,7 @@
 
     function scheduleRefresh() {
       syncFilters();
+      state.advertiserDirectory = null;
       clearTimeout(state.planTimer);
       clearTimeout(state.dashboardTimer);
       state.planTimer = setTimeout(loadPlan, 280);
@@ -1307,6 +1838,12 @@
     $("#review-scan").addEventListener("click", openConfirmation);
     $("#dialog-close").addEventListener("click", () => $("#confirm-dialog").close());
     $("#dialog-cancel").addEventListener("click", () => $("#confirm-dialog").close());
+    $("#advertiser-dialog-close").addEventListener("click", () => $("#advertiser-dialog").close());
+    $("#advertiser-dialog").addEventListener("close", () => {
+      state.advertiserProfile.sequence += 1;
+      state.advertiserProfile.data = null;
+      state.advertiserProfile.transparency = { status: "idle", data: null, message: "" };
+    });
     $("#confirm-scan").addEventListener("click", executePlan);
     $("#cancel-scan").addEventListener("click", () => {
       state.cancelRequested = true;
@@ -1314,7 +1851,53 @@
       $("#cancel-scan").textContent = "Interrupção solicitada";
     });
     document.addEventListener("click", (event) => {
+      const profileButton = event.target.closest("[data-open-advertiser]");
+      if (profileButton) {
+        openAdvertiserProfile({
+          advertiserId: profileButton.dataset.advertiserId || null,
+          domain: profileButton.dataset.advertiserDomain || "",
+          name: profileButton.dataset.advertiserName || "Concorrente observado",
+        });
+        return;
+      }
+      const profileTab = event.target.closest("[data-profile-tab]");
+      if (profileTab) {
+        activateProfileTab(profileTab.dataset.profileTab);
+        return;
+      }
+      const snapshotButton = event.target.closest("[data-load-snapshots]");
+      if (snapshotButton) {
+        loadLandingSnapshots(snapshotButton);
+        return;
+      }
+      if (event.target.closest("[data-action='scan-transparency']")) {
+        executeTransparencyScan();
+        return;
+      }
+      if (event.target.closest("[data-action='retry-transparency']")) {
+        state.advertiserProfile.transparency = { status: "idle", data: null, message: "" };
+        loadTransparencyStored();
+        return;
+      }
+      if (event.target.closest("[data-action='retry-profile']")) {
+        openAdvertiserProfile(state.advertiserProfile.reference || {});
+        return;
+      }
       if (event.target.closest("[data-action='retry-dashboard']")) loadDashboard();
+    });
+    document.addEventListener("keydown", (event) => {
+      const currentTab = event.target.closest?.("[data-profile-tab]");
+      if (!currentTab || !$("#advertiser-dialog").open) return;
+      const tabs = $$('[data-profile-tab]', $("#advertiser-dialog"));
+      const currentIndex = tabs.indexOf(currentTab);
+      let nextIndex = null;
+      if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabs.length;
+      if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+      if (event.key === "Home") nextIndex = 0;
+      if (event.key === "End") nextIndex = tabs.length - 1;
+      if (nextIndex === null) return;
+      event.preventDefault();
+      activateProfileTab(tabs[nextIndex].dataset.profileTab, true);
     });
 
     function setMenu(open) {
