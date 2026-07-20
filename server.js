@@ -34,4 +34,4 @@ http.createServer((request, response) => {
     });
     response.end(data);
   });
-}).listen(8765, '127.0.0.1');
+}).listen(Number(process.env.PFA_DEV_PORT || 8765), '127.0.0.1');

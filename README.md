@@ -42,7 +42,9 @@ pip install -r requirements.txt
 uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
-Abra `http://localhost:8000/radar` e informe as credenciais HTTP Basic.
+Abra `http://localhost:8000/dashboard` para usar o painel PFA com o Radar
+integrado. A rota `http://localhost:8000/radar` mantém a análise independente
+como contingência. As duas rotas usam as mesmas credenciais HTTP Basic.
 
 ## Validação
 

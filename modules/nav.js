@@ -50,6 +50,12 @@ function navigateToScreen(screenName) {
     setTimeout(renderConfigScreen, 50);
   } else if (screenName === 'financeiro') {
     setTimeout(renderFinanceiroScreen, 50);
+  } else if (screenName === 'radar') {
+    setTimeout(() => {
+      if (typeof window.initRadarDashboard === 'function') {
+        window.initRadarDashboard();
+      }
+    }, 50);
   }
 }
 
@@ -83,5 +89,4 @@ function openCurrentLeadFicha() {
 }
 window.openCurrentLeadFicha = openCurrentLeadFicha;
 window.initNavigation = initNavigation;
-
 

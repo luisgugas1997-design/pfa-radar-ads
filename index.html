@@ -73,6 +73,10 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet"><path d="M21 12V7H5a2 2 0 0 1 2-2h14v4"/><path d="M3 10h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"/></svg>
             <span>Financeiro</span>
           </li>
+          <li class="sidebar-item" data-screen="radar" data-label="Radar Google Ads">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/><path d="M11 8v6"/></svg>
+            <span>Radar Google Ads</span>
+          </li>
           <li class="sidebar-item" data-screen="configuracoes" data-label="Configurações">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
             <span>Configurações</span>
@@ -1009,6 +1013,119 @@
         </div>
       </div>
 
+      <!-- TELA: INTELIGÊNCIA / RADAR GOOGLE ADS -->
+      <div class="screen-panel" id="screen-radar">
+        <main class="radar-integrated" aria-labelledby="radar-page-title">
+          <header class="radar-page-header">
+            <div>
+              <span class="radar-eyebrow">Inteligência competitiva</span>
+              <h1 id="radar-page-title">Radar Google Ads</h1>
+              <p>Pressão observada, oportunidades e argumentos comerciais dos concorrentes.</p>
+            </div>
+            <div class="radar-header-actions">
+              <span class="radar-quota-badge is-loading" id="radar-quota-badge">Consultando saldo…</span>
+              <a class="radar-btn radar-btn-secondary" href="/radar" target="_blank" rel="noopener">Análise completa</a>
+              <button class="radar-btn radar-btn-primary" id="radar-new-scan" type="button">Nova varredura</button>
+            </div>
+          </header>
+
+          <section class="radar-filter-card" aria-label="Filtros da inteligência">
+            <label>Período
+              <select id="radar-filter-days"><option value="7">7 dias</option><option value="30" selected>30 dias</option><option value="90">90 dias</option></select>
+            </label>
+            <label>Serviço
+              <select id="radar-filter-service"><option value="">Todos</option></select>
+            </label>
+            <label>Cidade / região
+              <select id="radar-filter-location"><option value="">Todas</option></select>
+            </label>
+            <label>Dispositivo
+              <select id="radar-filter-device"><option value="">Todos</option><option value="mobile">Mobile</option><option value="desktop">Desktop</option></select>
+            </label>
+            <label>Janela crítica
+              <select id="radar-filter-window"><option value="all">Todos os horários</option><option value="commercial">Comercial · seg–sex, 09h–18h</option><option value="blitz">Madrugada de blitz · qui–dom, 22h–05h</option></select>
+            </label>
+            <button class="radar-btn radar-btn-dark" id="radar-apply-filters" type="button">Atualizar análise</button>
+          </section>
+
+          <div class="radar-feedback" id="radar-feedback" role="status" aria-live="polite"></div>
+          <section class="radar-kpi-grid" id="radar-kpis" aria-label="Indicadores principais">
+            <div class="radar-skeleton"></div><div class="radar-skeleton"></div><div class="radar-skeleton"></div><div class="radar-skeleton"></div>
+          </section>
+          <section class="radar-summary-strip" id="radar-executive-summary" aria-label="Resumo executivo"></section>
+
+          <div class="radar-main-grid">
+            <section class="radar-panel radar-market-panel">
+              <div class="radar-panel-heading">
+                <div><span class="radar-section-kicker">Pressão de mercado</span><h2>Presença observada por concorrente</h2></div>
+                <span class="radar-sample-badge" id="radar-sample-confidence">Amostra —</span>
+              </div>
+              <div id="radar-market-pressure" class="radar-market-list"></div>
+            </section>
+            <section class="radar-panel radar-opportunity-panel">
+              <div class="radar-panel-heading">
+                <div><span class="radar-section-kicker">Oceano azul</span><h2>Consultas com menor pressão</h2></div>
+                <button class="radar-text-button" id="radar-export-opportunities" type="button">Exportar CSV</button>
+              </div>
+              <div class="radar-table-wrap">
+                <table class="radar-table">
+                  <thead><tr><th>Consulta</th><th>Região</th><th>Concorrentes</th><th>Confiança</th></tr></thead>
+                  <tbody id="radar-opportunities"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <section class="radar-panel radar-messaging-panel">
+            <div class="radar-panel-heading">
+              <div><span class="radar-section-kicker">Biblioteca comercial</span><h2>Promessas, argumentos e CTAs observados</h2></div>
+              <button class="radar-text-button" id="radar-export-messages" type="button">Exportar CSV</button>
+            </div>
+            <div class="radar-message-grid" id="radar-messaging-library"></div>
+          </section>
+
+          <section class="radar-panel radar-observations-panel">
+            <div class="radar-panel-heading">
+              <div><span class="radar-section-kicker">Evidências recentes</span><h2>Anúncios e landing pages capturados</h2></div>
+              <span class="radar-method-badge">Dados observados, não estimativa de investimento</span>
+            </div>
+            <div class="radar-observation-grid" id="radar-recent-observations"></div>
+          </section>
+
+          <footer class="radar-methodology" id="radar-methodology"></footer>
+        </main>
+
+        <div class="radar-modal" id="radar-scan-modal" aria-hidden="true">
+          <div class="radar-modal-backdrop" data-radar-close-modal></div>
+          <section class="radar-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="radar-modal-title">
+            <button class="radar-modal-close" type="button" data-radar-close-modal aria-label="Fechar">×</button>
+            <span class="radar-eyebrow">Controle de créditos</span>
+            <h2 id="radar-modal-title">Confirmar nova varredura</h2>
+            <p>O planejamento é gratuito. A SerpApi só será consumida depois da confirmação final.</p>
+            <div class="radar-scan-fields">
+              <label>Serviço
+                <select id="radar-scan-service"><option value="Lei Seca">Lei Seca</option><option value="Suspensão">Suspensão</option><option value="Cassação">Cassação</option><option value="PPD">PPD</option><option value="Direito de Trânsito">Direito de Trânsito</option></select>
+              </label>
+              <label>Regiões (separadas por vírgula)
+                <input id="radar-scan-locations" type="text" value="Santo André, São Bernardo do Campo, São Caetano do Sul">
+              </label>
+              <label>Dispositivo
+                <select id="radar-scan-devices"><option value="mobile">Mobile</option><option value="desktop">Desktop</option><option value="mobile,desktop">Mobile + Desktop</option></select>
+              </label>
+              <label>Profundidade
+                <select id="radar-scan-mode"><option value="economico">Econômica</option><option value="completo">Completa</option></select>
+              </label>
+            </div>
+            <button class="radar-btn radar-btn-dark radar-plan-button" id="radar-preview-plan" type="button">Calcular custo antes de pesquisar</button>
+            <div class="radar-plan-summary" id="radar-plan-summary"></div>
+            <div class="radar-modal-actions">
+              <button class="radar-btn radar-btn-secondary" type="button" data-radar-close-modal>Cancelar</button>
+              <button class="radar-btn radar-btn-primary" id="radar-confirm-scan" type="button" disabled>Confirmar e consumir créditos</button>
+            </div>
+          </section>
+        </div>
+      </div>
+
 
     </div>
 
@@ -1223,6 +1340,7 @@
   <script src="modules/persona.js"></script>
   <script src="modules/configuracoes.js"></script>
   <script src="modules/ficha_cliente.js"></script>
+  <script src="modules/radar.js"></script>
   
   <script src="modules/init.js"></script>
 

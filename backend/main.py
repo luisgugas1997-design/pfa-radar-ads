@@ -64,8 +64,17 @@ logger = logging.getLogger("uvicorn.error")
 security = HTTPBasic(auto_error=False)
 scan_lock = asyncio.Lock()
 transparency_lock = asyncio.Lock()
-RADAR_FRONTEND_PATH = Path(__file__).resolve().parent.parent / "frontend" / "radar_mockup.html"
-SCREENSHOTS_PATH = Path(__file__).resolve().parent.parent / "screenshots"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+RADAR_FRONTEND_PATH = PROJECT_ROOT / "frontend" / "radar_mockup.html"
+DASHBOARD_FRONTEND_PATH = PROJECT_ROOT / "index.html"
+DASHBOARD_MODULES_PATH = PROJECT_ROOT / "modules"
+DASHBOARD_ASSETS = {
+    "style.css": PROJECT_ROOT / "style.css",
+    "mockData.js": PROJECT_ROOT / "mockData.js",
+    "app.js": PROJECT_ROOT / "app.js",
+    "logo-pfa.png": PROJECT_ROOT / "logo-pfa.png",
+}
+SCREENSHOTS_PATH = PROJECT_ROOT / "screenshots"
 SCREENSHOTS_PATH.mkdir(parents=True, exist_ok=True)
 
 
@@ -103,6 +112,35 @@ async def health_check() -> dict:
 @app.get("/radar", include_in_schema=False, dependencies=RADAR_PROTEGIDO)
 async def radar_frontend() -> FileResponse:
     return FileResponse(RADAR_FRONTEND_PATH)
+
+
+@app.get("/dashboard", include_in_schema=False, dependencies=RADAR_PROTEGIDO)
+async def dashboard_frontend() -> FileResponse:
+    """Entrega o dashboard PFA com o Radar integrado, sem expor arquivos internos."""
+    return FileResponse(DASHBOARD_FRONTEND_PATH)
+
+
+@app.get("/{asset_name}", include_in_schema=False, dependencies=RADAR_PROTEGIDO)
+async def dashboard_asset(asset_name: str) -> FileResponse:
+    arquivo = DASHBOARD_ASSETS.get(asset_name)
+    if arquivo is None or not arquivo.is_file():
+        raise HTTPException(status_code=404, detail="Arquivo não encontrado.")
+    return FileResponse(arquivo)
+
+
+@app.get(
+    "/modules/{file_name}",
+    include_in_schema=False,
+    dependencies=RADAR_PROTEGIDO,
+)
+async def dashboard_module(file_name: str) -> FileResponse:
+    nome_seguro = Path(file_name).name
+    if nome_seguro != file_name or Path(nome_seguro).suffix.lower() != ".js":
+        raise HTTPException(status_code=404, detail="Módulo não encontrado.")
+    arquivo = DASHBOARD_MODULES_PATH / nome_seguro
+    if not arquivo.is_file():
+        raise HTTPException(status_code=404, detail="Módulo não encontrado.")
+    return FileResponse(arquivo, media_type="text/javascript")
 
 
 @app.get(
