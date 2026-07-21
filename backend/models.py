@@ -3,12 +3,14 @@ from typing import Any
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     CHAR,
     CheckConstraint,
     DateTime,
     ForeignKey,
     Index,
     Integer,
+    Identity,
     SmallInteger,
     String,
     Text,
@@ -353,3 +355,117 @@ class ProviderUsageEvent(Base):
     search_run: Mapped["SearchRun | None"] = relationship(
         back_populates="usage_events"
     )
+
+
+class ClientPortal(Base):
+    __tablename__ = "client_portals"
+    __table_args__ = (
+        Index("client_portals_external_client_idx", "external_client_id"),
+        {"schema": "client_portal"},
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    external_client_id: Mapped[str] = mapped_column(String(80), unique=True)
+    client_name: Mapped[str] = mapped_column(String(255))
+    case_number: Mapped[str | None] = mapped_column(String(120))
+    case_type: Mapped[str | None] = mapped_column(String(160))
+    stage: Mapped[str | None] = mapped_column(String(120))
+    responsible_name: Mapped[str | None] = mapped_column(String(160))
+    visible_sections: Mapped[dict[str, bool]] = mapped_column(
+        JSONB, server_default=text("'{}'::jsonb")
+    )
+    token_version: Mapped[int] = mapped_column(Integer, server_default=text("1"))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_by: Mapped[str] = mapped_column(String(160))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    updates: Mapped[list["ClientPortalUpdate"]] = relationship(
+        back_populates="portal", cascade="all, delete-orphan"
+    )
+    audit_events: Mapped[list["ClientPortalAudit"]] = relationship(
+        back_populates="portal", cascade="all, delete-orphan"
+    )
+    access_events: Mapped[list["ClientPortalAccess"]] = relationship(
+        back_populates="portal", cascade="all, delete-orphan"
+    )
+
+
+class ClientPortalUpdate(Base):
+    __tablename__ = "portal_updates"
+    __table_args__ = (
+        UniqueConstraint(
+            "portal_id", "source_ref", name="portal_updates_source_unique"
+        ),
+        Index("portal_updates_visible_idx", "portal_id", "visible_to_client"),
+        {"schema": "client_portal"},
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    portal_id: Mapped[str] = mapped_column(
+        ForeignKey("client_portal.client_portals.id", ondelete="CASCADE")
+    )
+    source_ref: Mapped[str] = mapped_column(String(160))
+    title: Mapped[str] = mapped_column(String(255))
+    description: Mapped[str | None] = mapped_column(Text)
+    occurred_label: Mapped[str | None] = mapped_column(String(80))
+    visible_to_client: Mapped[bool] = mapped_column(
+        Boolean, server_default=text("false")
+    )
+    published_by: Mapped[str | None] = mapped_column(String(160))
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    portal: Mapped["ClientPortal"] = relationship(back_populates="updates")
+
+
+class ClientPortalAudit(Base):
+    __tablename__ = "portal_audit_events"
+    __table_args__ = (
+        Index("portal_audit_events_portal_idx", "portal_id", "created_at"),
+        {"schema": "client_portal"},
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    portal_id: Mapped[str] = mapped_column(
+        ForeignKey("client_portal.client_portals.id", ondelete="CASCADE")
+    )
+    action: Mapped[str] = mapped_column(String(60))
+    actor: Mapped[str] = mapped_column(String(160))
+    details: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, server_default=text("'{}'::jsonb")
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    portal: Mapped["ClientPortal"] = relationship(back_populates="audit_events")
+
+
+class ClientPortalAccess(Base):
+    __tablename__ = "portal_access_events"
+    __table_args__ = (
+        Index("portal_access_events_portal_idx", "portal_id", "accessed_at"),
+        {"schema": "client_portal"},
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    portal_id: Mapped[str] = mapped_column(
+        ForeignKey("client_portal.client_portals.id", ondelete="CASCADE")
+    )
+    visitor_fingerprint: Mapped[str] = mapped_column(CHAR(64))
+    accessed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    portal: Mapped["ClientPortal"] = relationship(back_populates="access_events")

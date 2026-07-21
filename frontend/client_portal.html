@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Acompanhamento do caso | PFA Advogados</title>
+  <style>
+    :root { --wine:#690018; --gold:#d7ad28; --ink:#172033; --muted:#667085; --line:#e5e9f0; --soft:#f5f7fa; --green:#087a48; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; font-family:Inter,Segoe UI,Arial,sans-serif; color:var(--ink); background:linear-gradient(145deg,#f4f6f9 0%,#fff 48%,#f6efe7 100%); }
+    header { background:linear-gradient(120deg,#520012,#7b001d); color:#fff; border-bottom:4px solid var(--gold); }
+    .header-inner,.shell { width:min(920px,calc(100% - 32px)); margin:auto; }
+    .header-inner { min-height:92px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .brand { display:flex; align-items:center; gap:13px; }
+    .brand-mark { width:46px; height:46px; display:grid; place-items:center; border:1px solid rgba(255,255,255,.5); border-radius:50%; color:#ffe18a; font-family:Georgia,serif; font-weight:800; }
+    .brand strong { display:block; font-size:17px; }
+    .brand span,.secure { font-size:12px; color:#eadfe2; }
+    .secure { padding:8px 12px; border:1px solid rgba(255,255,255,.25); border-radius:999px; }
+    .shell { padding:28px 0 48px; }
+    .welcome { display:grid; grid-template-columns:1fr auto; gap:18px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:18px; padding:24px; box-shadow:0 18px 45px rgba(29,38,55,.08); }
+    .eyebrow { margin:0 0 8px; color:var(--wine); font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+    h1 { margin:0; font-size:clamp(24px,4vw,34px); line-height:1.08; }
+    .subtitle { margin:9px 0 0; color:var(--muted); line-height:1.5; }
+    .status { min-width:150px; padding:14px 16px; border-radius:14px; background:#edf9f3; border:1px solid #bce9d2; color:var(--green); text-align:center; font-weight:800; }
+    .grid { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(250px,.85fr); gap:18px; margin-top:18px; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:0 8px 30px rgba(29,38,55,.05); }
+    .card h2 { margin:0 0 15px; font-size:16px; }
+    .meta { display:grid; gap:12px; }
+    .meta-row { display:flex; justify-content:space-between; gap:18px; padding-bottom:11px; border-bottom:1px solid var(--line); }
+    .meta-row:last-child { padding-bottom:0; border-bottom:0; }
+    .meta-row span { color:var(--muted); font-size:12px; }
+    .meta-row strong { text-align:right; font-size:13px; overflow-wrap:anywhere; }
+    .timeline { display:grid; gap:12px; }
+    .event { position:relative; padding:0 0 16px 23px; border-bottom:1px solid var(--line); }
+    .event:last-child { border-bottom:0; padding-bottom:0; }
+    .event::before { content:""; position:absolute; left:0; top:5px; width:9px; height:9px; border-radius:50%; background:var(--gold); box-shadow:0 0 0 4px #fff4cc; }
+    .event strong { display:block; font-size:14px; }
+    .event p { margin:5px 0 0; color:#4c566a; font-size:13px; line-height:1.5; white-space:pre-wrap; }
+    .event time { display:block; margin-top:6px; color:var(--muted); font-size:11px; }
+    .empty { padding:24px; border:1px dashed #cbd2dc; border-radius:12px; color:var(--muted); text-align:center; font-size:13px; }
+    .notice { margin-top:18px; padding:14px 18px; border-radius:12px; background:#fffaf0; border:1px solid #f1d993; color:#6f5511; font-size:12px; line-height:1.5; }
+    .state { width:min(520px,calc(100% - 32px)); margin:13vh auto; padding:32px; border-radius:18px; background:#fff; border:1px solid var(--line); text-align:center; box-shadow:0 18px 45px rgba(29,38,55,.1); }
+    .state h1 { font-size:24px; }
+    .state p { color:var(--muted); line-height:1.5; }
+    footer { padding:22px 0 0; text-align:center; color:var(--muted); font-size:11px; }
+    [hidden] { display:none !important; }
+    @media (max-width:700px) { .header-inner { min-height:78px; } .secure { display:none; } .shell { padding-top:18px; } .welcome { grid-template-columns:1fr; padding:19px; } .status { text-align:left; min-width:0; } .grid { grid-template-columns:1fr; } .card { padding:17px; } }
+  </style>
+</head>
+<body>
+  <div id="loading" class="state"><h1>Carregando acompanhamento</h1><p>Estamos validando o acesso seguro ao seu caso.</p></div>
+  <div id="error" class="state" hidden><h1 id="error-title">Acesso indisponível</h1><p id="error-message">Não foi possível abrir este acompanhamento.</p></div>
+  <main id="portal" hidden>
+    <header>
+      <div class="header-inner">
+        <div class="brand"><div class="brand-mark">PFA</div><div><strong>PFA Advogados</strong><span>Acompanhamento jurídico</span></div></div>
+        <div class="secure">Acesso individual e protegido</div>
+      </div>
+    </header>
+    <div class="shell">
+      <section class="welcome">
+        <div><p class="eyebrow">Portal do cliente</p><h1>Olá, <span id="client-name"></span></h1><p class="subtitle">Acompanhe somente as atualizações publicadas pela equipe responsável pelo seu caso.</p></div>
+        <div id="stage-badge" class="status"></div>
+      </section>
+      <div class="grid">
+        <section class="card"><h2>Andamentos publicados</h2><div id="timeline" class="timeline"></div></section>
+        <aside class="card"><h2>Resumo do caso</h2><div id="case-meta" class="meta"></div></aside>
+      </div>
+      <div class="notice">Este portal apresenta informações de acompanhamento e não substitui comunicação formal, intimação ou orientação jurídica individual da equipe.</div>
+      <footer>PFA Advogados · Conteúdo disponibilizado exclusivamente para o titular deste link.</footer>
+    </div>
+  </main>
+  <script>
+    const token = decodeURIComponent(location.pathname.split('/').filter(Boolean).pop() || '');
+    const loading = document.getElementById('loading');
+    const errorBox = document.getElementById('error');
+    const portal = document.getElementById('portal');
+
+    function textRow(label, value) {
+      const row = document.createElement('div'); row.className = 'meta-row';
+      const name = document.createElement('span'); name.textContent = label;
+      const content = document.createElement('strong'); content.textContent = value || 'Não informado';
+      row.append(name, content); return row;
+    }
+
+    function showError(status, message) {
+      loading.hidden = true; errorBox.hidden = false;
+      document.getElementById('error-title').textContent = status === 410 ? 'Acesso encerrado' : 'Acompanhamento indisponível';
+      document.getElementById('error-message').textContent = message || 'O link pode ter expirado, sido revogado ou substituído.';
+    }
+
+    async function loadPortal() {
+      try {
+        const response = await fetch(`/api/public/portal/${encodeURIComponent(token)}`, { cache:'no-store' });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) return showError(response.status, payload.detail);
+        document.getElementById('client-name').textContent = payload.client_name || 'cliente';
+        document.getElementById('stage-badge').textContent = payload.stage || 'Caso em acompanhamento';
+        const meta = document.getElementById('case-meta');
+        if (payload.visible_sections?.case !== false) {
+          meta.append(textRow('Tipo de caso', payload.case_type), textRow('Processo', payload.case_number), textRow('Responsável', payload.responsible_name));
+        } else {
+          meta.append(textRow('Status', 'Informações preservadas pela equipe'));
+        }
+        const timeline = document.getElementById('timeline');
+        if (!payload.updates?.length) {
+          const empty = document.createElement('div'); empty.className = 'empty'; empty.textContent = 'Ainda não há novos andamentos publicados.'; timeline.append(empty);
+        } else {
+          payload.updates.forEach(item => {
+            const event = document.createElement('article'); event.className = 'event';
+            const title = document.createElement('strong'); title.textContent = item.title;
+            event.append(title);
+            if (item.description) { const description = document.createElement('p'); description.textContent = item.description; event.append(description); }
+            if (item.occurred_label) { const date = document.createElement('time'); date.textContent = item.occurred_label; event.append(date); }
+            timeline.append(event);
+          });
+        }
+        loading.hidden = true; portal.hidden = false;
+      } catch (_) { showError(503, 'O serviço está temporariamente indisponível. Tente novamente mais tarde.'); }
+    }
+    loadPortal();
+  </script>
+</body>
+</html>

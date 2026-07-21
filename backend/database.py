@@ -25,6 +25,7 @@ async def initialize_database() -> None:
     """Cria a estrutura do Radar quando ela ainda não existir."""
     async with engine.begin() as connection:
         await connection.execute(text("CREATE SCHEMA IF NOT EXISTS radar"))
+        await connection.execute(text("CREATE SCHEMA IF NOT EXISTS client_portal"))
         await connection.run_sync(Base.metadata.create_all)
         await connection.execute(
             text(

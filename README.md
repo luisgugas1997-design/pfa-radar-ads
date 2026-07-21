@@ -31,6 +31,9 @@ DATABASE_URL=postgresql+asyncpg://usuario:senha@host:5432/banco
 SERPAPI_API_KEY=chave_da_serpapi
 RADAR_ACCESS_USER=usuario_do_painel
 RADAR_ACCESS_PASSWORD=senha_forte_do_painel
+PFA_PORTAL_SECRET=segredo_aleatorio_com_no_minimo_32_caracteres
+PFA_PORTAL_PUBLIC_URL=https://dominio-publico-da-api
+PFA_DASHBOARD_ORIGINS=https://painel.pfa.adv.br
 ```
 
 O arquivo `.env` é ignorado pelo Git e pelo contexto Docker.
@@ -45,6 +48,14 @@ uvicorn backend.main:app --host 0.0.0.0 --port 8000
 Abra `http://localhost:8000/dashboard` para usar o painel PFA com o Radar
 integrado. A rota `http://localhost:8000/radar` mantém a análise independente
 como contingência. As duas rotas usam as mesmas credenciais HTTP Basic.
+
+## Portal de acompanhamento do cliente
+
+As rotas administrativas `/api/portal/*` usam a mesma proteÃ§Ã£o HTTP Basic do
+Radar. O endereÃ§o `/acompanhamento/{token}` e a rota de leitura pÃºblica aceitam
+somente tokens assinados pelo `PFA_PORTAL_SECRET`. RevogaÃ§Ã£o, regeneraÃ§Ã£o,
+publicaÃ§Ã£o, acessos e alteraÃ§Ãµes ficam registrados no PostgreSQL. O dashboard
+envia apenas os andamentos marcados expressamente como visÃ­veis ao cliente.
 
 ## Validação
 

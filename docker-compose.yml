@@ -16,6 +16,9 @@ services:
       SERPAPI_KEY: ${SERPAPI_API_KEY}
       RADAR_ACCESS_USER: ${RADAR_ACCESS_USER}
       RADAR_ACCESS_PASSWORD: ${RADAR_ACCESS_PASSWORD}
+      PFA_PORTAL_SECRET: ${PFA_PORTAL_SECRET}
+      PFA_PORTAL_PUBLIC_URL: ${PFA_PORTAL_PUBLIC_URL:-https://chatwoot-radar-api.phqoes.easypanel.host}
+      PFA_DASHBOARD_ORIGINS: ${PFA_DASHBOARD_ORIGINS:-https://painel.pfa.adv.br}
 
     volumes:
       - pfa_radar_screenshots:/app/screenshots

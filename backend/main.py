@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Annotated, Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, ConfigDict, Field
@@ -34,6 +35,7 @@ from backend.services.transparency_service import (
     obter_transparency_do_anunciante,
     resumir_transparency_scan,
 )
+from backend.routes.client_portal import admin_router, public_router
 
 
 class ScanRequest(BaseModel):
@@ -61,12 +63,25 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title="Radar API", lifespan=lifespan)
+portal_origins = {
+    "null",
+    "https://painel.pfa.adv.br",
+    *filter(None, os.getenv("PFA_DASHBOARD_ORIGINS", "").split(",")),
+}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=sorted(origin.strip() for origin in portal_origins),
+    allow_credentials=True,
+    allow_methods=["GET", "PUT", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
+)
 logger = logging.getLogger("uvicorn.error")
 security = HTTPBasic(auto_error=False)
 scan_lock = asyncio.Lock()
 transparency_lock = asyncio.Lock()
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 RADAR_FRONTEND_PATH = PROJECT_ROOT / "frontend" / "radar_mockup.html"
+CLIENT_PORTAL_FRONTEND_PATH = PROJECT_ROOT / "frontend" / "client_portal.html"
 DASHBOARD_FRONTEND_PATH = PROJECT_ROOT / "index.html"
 DASHBOARD_MODULES_PATH = PROJECT_ROOT / "modules"
 DASHBOARD_ASSETS = {
@@ -103,6 +118,8 @@ async def verificar_acesso_radar(
 
 
 RADAR_PROTEGIDO = [Depends(verificar_acesso_radar)]
+app.include_router(admin_router, dependencies=RADAR_PROTEGIDO)
+app.include_router(public_router)
 
 
 @app.get("/")
@@ -142,6 +159,12 @@ async def dashboard_module(file_name: str) -> FileResponse:
     if not arquivo.is_file():
         raise HTTPException(status_code=404, detail="Módulo não encontrado.")
     return FileResponse(arquivo, media_type="text/javascript")
+@app.get("/acompanhamento/{token}", include_in_schema=False)
+async def client_portal_frontend(token: str) -> FileResponse:
+    return FileResponse(
+        CLIENT_PORTAL_FRONTEND_PATH,
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 @app.get(
