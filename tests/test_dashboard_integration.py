@@ -27,7 +27,9 @@ def test_radar_module_requires_confirmation_before_paid_scan() -> None:
 
 
 def test_fastapi_exposes_protected_dashboard_assets() -> None:
-    route_paths = {route.path for route in app.routes}
+    route_paths = {
+        route.path for route in app.routes if getattr(route, "path", None)
+    }
 
     assert "/dashboard" in route_paths
     assert "/modules/{file_name}" in route_paths
